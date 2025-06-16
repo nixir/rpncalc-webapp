@@ -15,6 +15,7 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted, onUnmounted } from 'vue'
 import { useRPNStore } from '@/stores/rpnCalculator'
 import CalculatorDisplay from './CalculatorDisplay.vue'
 import CalculatorKeyboard from './CalculatorKeyboard.vue'
@@ -84,6 +85,83 @@ const handleButtonPress = (value: string) => {
       console.warn('Unknown button pressed:', value)
   }
 }
+
+const handleKeyboardInput = (event: KeyboardEvent) => {
+  // Prevent default behavior for calculator keys
+  const key = event.key
+  
+  switch (key) {
+    case '0':
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+    case '8':
+    case '9':
+      event.preventDefault()
+      store.inputDigit(key)
+      break
+    
+    case '.':
+      event.preventDefault()
+      store.inputDecimal()
+      break
+    
+    case 'Enter':
+      event.preventDefault()
+      store.enterNumber()
+      break
+    
+    case '+':
+      event.preventDefault()
+      store.performOperation('+')
+      break
+    
+    case '-':
+      event.preventDefault()
+      store.performOperation('-')
+      break
+    
+    case '*':
+      event.preventDefault()
+      store.performOperation('×')
+      break
+    
+    case '/':
+      event.preventDefault()
+      store.performOperation('÷')
+      break
+    
+    case 'Backspace':
+      event.preventDefault()
+      store.deleteLastDigit()
+      break
+    
+    case 'Escape':
+      event.preventDefault()
+      store.clearAll()
+      break
+    
+    case 'u':
+    case 'U':
+      if (event.ctrlKey || event.metaKey) {
+        event.preventDefault()
+        store.undoLastOperation()
+      }
+      break
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('keydown', handleKeyboardInput)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleKeyboardInput)
+})
 </script>
 
 <style scoped>
