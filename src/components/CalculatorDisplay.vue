@@ -1,19 +1,13 @@
 <template>
   <div class="calculator-display">
-    <!-- Empty slots to maintain 4-row layout (at top for older stack levels) -->
+    <!-- Stack display with labels (T, Z, Y, X from top to bottom) -->
     <div
-      v-for="i in emptySlots"
-      :key="`empty-${i}`"
-      class="stack-item empty"
-    />
-    
-    <!-- Stack values (up to 4, X register at bottom) -->
-    <div
-      v-for="(value, index) in displayValues"
+      v-for="(item, index) in stackDisplay"
       :key="`stack-${index}`"
-      :class="['stack-item', { 'current-input': index === displayValues.length - 1 && isCurrentInput }]"
+      :class="['stack-item', { 'current-input': item.isCurrentInput }]"
     >
-      {{ formatNumber(value) }}
+      <div class="stack-label">{{ item.label }}</div>
+      <div class="stack-value">{{ item.value }}</div>
     </div>
   </div>
 </template>
@@ -29,25 +23,35 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const displayValues = computed(() => {
-  const result = [...props.stack]
+const stackDisplay = computed(() => {
+  const stackLabels = ['T', 'Z', 'Y', 'X']
+  const values = [...props.stack]
   
   // Add current input as the last item if in input mode
   if (props.inputMode && props.currentInput) {
     const inputNum = parseFloat(props.currentInput) || 0
-    result.push(inputNum)
+    values.push(inputNum)
   }
   
-  // Show only the last 4 values (X register at bottom)
-  return result.slice(-4)
-})
-
-const emptySlots = computed(() => {
-  return Math.max(0, 4 - displayValues.value.length)
-})
-
-const isCurrentInput = computed(() => {
-  return props.inputMode && props.currentInput !== ''
+  // Get the last 4 values (or fewer if stack is smaller)
+  const displayValues = values.slice(-4)
+  
+  // Create stack display items (always 4 rows: T, Z, Y, X)
+  return stackLabels.map((label, index) => {
+    const valueIndex = index - (4 - displayValues.length)
+    const hasValue = valueIndex >= 0
+    const value = hasValue ? displayValues[valueIndex] : null
+    const isCurrentInput = hasValue && 
+      props.inputMode && 
+      props.currentInput !== '' && 
+      valueIndex === displayValues.length - 1
+    
+    return {
+      label,
+      value: value !== null ? formatNumber(value) : '',
+      isCurrentInput
+    }
+  })
 })
 
 const formatNumber = (value: number): string => {
@@ -85,45 +89,65 @@ const formatNumber = (value: number): string => {
 
 .stack-item {
   display: flex;
-  justify-content: flex-end;
   align-items: center;
   color: #fff;
-  font-size: 2rem;
-  font-weight: 300;
   min-height: 2.5rem;
   padding: 0.25rem 0;
+  gap: 1rem;
+}
+
+.stack-label {
+  flex: 0 0 auto;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #888;
+  width: 1.5rem;
+  text-align: left;
+}
+
+.stack-value {
+  flex: 1;
+  font-size: 2rem;
+  font-weight: 300;
+  text-align: right;
   word-break: break-all;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.stack-item.current-input {
+.stack-item.current-input .stack-value {
   color: #fff;
   font-weight: 400;
 }
 
-.stack-item.empty {
-  color: transparent;
-}
-
 /* Responsive font sizes */
 @media (max-height: 700px) {
-  .stack-item {
+  .stack-value {
     font-size: 1.6rem;
+  }
+  .stack-item {
     min-height: 2rem;
+  }
+  .stack-label {
+    font-size: 0.9rem;
   }
 }
 
 @media (max-height: 600px) {
-  .stack-item {
+  .stack-value {
     font-size: 1.4rem;
+  }
+  .stack-item {
     min-height: 1.8rem;
+  }
+  .stack-label {
+    font-size: 0.8rem;
   }
 }
 
 /* Adjust text size if number is too long */
-.stack-item {
+.stack-value {
   font-size: clamp(1.2rem, 4vw, 2rem);
 }
 </style>
