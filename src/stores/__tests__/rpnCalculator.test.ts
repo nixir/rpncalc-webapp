@@ -385,6 +385,1680 @@ describe('RPN Calculator Store - HP-style Stack Lift', () => {
     })
   })
 
+  describe('Division (÷) Operation', () => {
+    it('should perform basic division with positive numbers', () => {
+      // 8 ÷ 2 = 4
+      store.inputDigit('8')
+      store.enterNumber()
+      store.inputDigit('2')
+      store.performOperation('÷')
+      
+      expect(store.stack).toEqual([4])
+    })
+
+    it('should perform division with negative and positive numbers', () => {
+      // -8 ÷ 2 = -4
+      store.inputDigit('8')
+      store.toggleSign()
+      store.enterNumber()
+      store.inputDigit('2')
+      store.performOperation('÷')
+      
+      expect(store.stack).toEqual([-4])
+    })
+
+    it('should perform division with positive and negative numbers', () => {
+      // 8 ÷ -2 = -4
+      store.inputDigit('8')
+      store.enterNumber()
+      store.inputDigit('2')
+      store.toggleSign()
+      store.performOperation('÷')
+      
+      expect(store.stack).toEqual([-4])
+    })
+
+    it('should perform division with both negative numbers', () => {
+      // -8 ÷ -2 = 4
+      store.inputDigit('8')
+      store.toggleSign()
+      store.enterNumber()
+      store.inputDigit('2')
+      store.toggleSign()
+      store.performOperation('÷')
+      
+      expect(store.stack).toEqual([4])
+    })
+
+    it('should perform division resulting in decimal', () => {
+      // 5 ÷ 2 = 2.5
+      store.inputDigit('5')
+      store.enterNumber()
+      store.inputDigit('2')
+      store.performOperation('÷')
+      
+      expect(store.stack).toEqual([2.5])
+    })
+
+    it('should perform division with decimal numbers', () => {
+      // 7.5 ÷ 2.5 = 3
+      store.inputDigit('7')
+      store.inputDecimal()
+      store.inputDigit('5')
+      store.enterNumber()
+      store.inputDigit('2')
+      store.inputDecimal()
+      store.inputDigit('5')
+      store.performOperation('÷')
+      
+      expect(store.stack).toEqual([3])
+    })
+
+    it('should handle division by zero with positive number', () => {
+      // 5 ÷ 0 = 0 (as implemented)
+      store.inputDigit('5')
+      store.enterNumber()
+      store.inputDigit('0')
+      store.performOperation('÷')
+      
+      expect(store.stack).toEqual([0])
+    })
+
+    it('should handle division by zero with negative number', () => {
+      // -5 ÷ 0 = 0 (as implemented)
+      store.inputDigit('5')
+      store.toggleSign()
+      store.enterNumber()
+      store.inputDigit('0')
+      store.performOperation('÷')
+      
+      expect(store.stack).toEqual([0])
+    })
+
+    it('should handle zero divided by zero', () => {
+      // 0 ÷ 0 = 0 (as implemented)
+      store.inputDigit('0')
+      store.enterNumber()
+      store.inputDigit('0')
+      store.performOperation('÷')
+      
+      expect(store.stack).toEqual([0])
+    })
+
+    it('should follow correct RPN order (Y ÷ X)', () => {
+      // Test that 10 ÷ 2 = 5, not 2 ÷ 10 = 0.2
+      // Stack before operation: [10, 2] (Y=10, X=2)
+      // Result should be Y ÷ X = 10 ÷ 2 = 5
+      
+      store.inputDigit('1')
+      store.inputDigit('0')
+      store.enterNumber()
+      store.inputDigit('2')
+      store.performOperation('÷')
+      
+      expect(store.stack).toEqual([5])
+    })
+
+    it('should verify RPN order with different numbers', () => {
+      // 20 ÷ 4 = 5 (not 4 ÷ 20 = 0.2)
+      store.inputDigit('2')
+      store.inputDigit('0')
+      store.enterNumber()
+      store.inputDigit('4')
+      store.performOperation('÷')
+      
+      expect(store.stack).toEqual([5])
+    })
+
+    it('should handle consecutive divisions', () => {
+      // 100 ÷ 10 ÷ 2 = 5
+      store.inputDigit('1')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.enterNumber()
+      store.inputDigit('1')
+      store.inputDigit('0')
+      store.performOperation('÷')
+      expect(store.stack).toEqual([10])
+      
+      store.inputDigit('2')
+      store.performOperation('÷')
+      expect(store.stack).toEqual([5])
+    })
+
+    it('should do nothing with empty stack', () => {
+      // No values in stack
+      expect(store.stack).toEqual([])
+      
+      store.performOperation('÷')
+      expect(store.stack).toEqual([])
+    })
+
+    it('should do nothing with only one value in stack', () => {
+      // Only one value in stack
+      store.inputDigit('5')
+      store.enterNumber()
+      expect(store.stack).toEqual([5])
+      
+      store.performOperation('÷')
+      expect(store.stack).toEqual([5]) // Should remain unchanged
+    })
+
+    it('should automatically enter current input before division', () => {
+      // Test that current input is automatically entered
+      store.inputDigit('1')
+      store.inputDigit('2')
+      store.enterNumber()
+      
+      // Start entering new number but don't press Enter
+      store.inputDigit('3')
+      expect(store.inputMode).toBe(true)
+      expect(store.currentInput).toBe('3')
+      
+      // Perform division - should auto-enter 3 first
+      store.performOperation('÷')
+      expect(store.stack).toEqual([4]) // 12 ÷ 3 = 4
+      expect(store.inputMode).toBe(false)
+      expect(store.currentInput).toBe('')
+    })
+
+    it('should handle complex calculation with division', () => {
+      // Calculate: (15 + 5) ÷ (8 - 4) = 20 ÷ 4 = 5
+      
+      // First part: 15 + 5 = 20
+      store.inputDigit('1')
+      store.inputDigit('5')
+      store.enterNumber()
+      store.inputDigit('5')
+      store.performOperation('+')
+      expect(store.stack).toEqual([20])
+      
+      // Second part: 8 - 4 = 4
+      store.inputDigit('8')
+      store.enterNumber()
+      store.inputDigit('4')
+      store.performOperation('-')
+      expect(store.stack).toEqual([20, 4])
+      
+      // Final division: 20 ÷ 4 = 5
+      store.performOperation('÷')
+      expect(store.stack).toEqual([5])
+    })
+
+    it('should handle division in real-world scenario', () => {
+      // Calculate area: length × width ÷ conversion_factor
+      // Example: 12 × 8 ÷ 3 = 32
+      
+      store.inputDigit('1')
+      store.inputDigit('2')
+      store.enterNumber()
+      store.inputDigit('8')
+      store.performOperation('×')
+      expect(store.stack).toEqual([96])
+      
+      store.inputDigit('3')
+      store.performOperation('÷')
+      expect(store.stack).toEqual([32])
+    })
+
+    it('should preserve precision with decimal division', () => {
+      // 1 ÷ 3 should give precise decimal result
+      store.inputDigit('1')
+      store.enterNumber()
+      store.inputDigit('3')
+      store.performOperation('÷')
+      
+      // Should be approximately 0.3333333333333333
+      expect(store.stack[0]).toBeCloseTo(0.3333333333333333)
+    })
+
+    it('should handle very small division results', () => {
+      // 1 ÷ 1000000 = 0.000001
+      store.inputDigit('1')
+      store.enterNumber()
+      store.inputDigit('1')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.performOperation('÷')
+      
+      expect(store.stack[0]).toBeCloseTo(0.000001)
+    })
+  })
+
+  describe('Multiplication (×) Operation', () => {
+    it('should perform basic multiplication with positive numbers', () => {
+      // 3 × 4 = 12
+      store.inputDigit('3')
+      store.enterNumber()
+      store.inputDigit('4')
+      store.performOperation('×')
+      
+      expect(store.stack).toEqual([12])
+    })
+
+    it('should perform multiplication with positive and negative numbers', () => {
+      // 3 × -4 = -12
+      store.inputDigit('3')
+      store.enterNumber()
+      store.inputDigit('4')
+      store.toggleSign()
+      store.performOperation('×')
+      
+      expect(store.stack).toEqual([-12])
+    })
+
+    it('should perform multiplication with negative and positive numbers', () => {
+      // -3 × 4 = -12
+      store.inputDigit('3')
+      store.toggleSign()
+      store.enterNumber()
+      store.inputDigit('4')
+      store.performOperation('×')
+      
+      expect(store.stack).toEqual([-12])
+    })
+
+    it('should perform multiplication with both negative numbers', () => {
+      // -3 × -4 = 12
+      store.inputDigit('3')
+      store.toggleSign()
+      store.enterNumber()
+      store.inputDigit('4')
+      store.toggleSign()
+      store.performOperation('×')
+      
+      expect(store.stack).toEqual([12])
+    })
+
+    it('should perform multiplication with zero', () => {
+      // 5 × 0 = 0
+      store.inputDigit('5')
+      store.enterNumber()
+      store.inputDigit('0')
+      store.performOperation('×')
+      
+      expect(store.stack).toEqual([0])
+    })
+
+    it('should perform multiplication with zero as first operand', () => {
+      // 0 × 5 = 0
+      store.inputDigit('0')
+      store.enterNumber()
+      store.inputDigit('5')
+      store.performOperation('×')
+      
+      expect(store.stack).toEqual([0])
+    })
+
+    it('should perform multiplication with decimal numbers', () => {
+      // 2.5 × 3.2 = 8.0
+      store.inputDigit('2')
+      store.inputDecimal()
+      store.inputDigit('5')
+      store.enterNumber()
+      store.inputDigit('3')
+      store.inputDecimal()
+      store.inputDigit('2')
+      store.performOperation('×')
+      
+      expect(store.stack).toEqual([8])
+    })
+
+    it('should perform multiplication with integer and decimal', () => {
+      // 4 × 2.5 = 10
+      store.inputDigit('4')
+      store.enterNumber()
+      store.inputDigit('2')
+      store.inputDecimal()
+      store.inputDigit('5')
+      store.performOperation('×')
+      
+      expect(store.stack).toEqual([10])
+    })
+
+    it('should preserve decimal precision in multiplication', () => {
+      // 1.1 × 1.1 = 1.21
+      store.inputDigit('1')
+      store.inputDecimal()
+      store.inputDigit('1')
+      store.enterNumber()
+      store.inputDigit('1')
+      store.inputDecimal()
+      store.inputDigit('1')
+      store.performOperation('×')
+      
+      expect(store.stack[0]).toBeCloseTo(1.21)
+    })
+
+    it('should multiply by one (identity property)', () => {
+      // 7 × 1 = 7
+      store.inputDigit('7')
+      store.enterNumber()
+      store.inputDigit('1')
+      store.performOperation('×')
+      
+      expect(store.stack).toEqual([7])
+    })
+
+    it('should multiply one by a number', () => {
+      // 1 × 7 = 7
+      store.inputDigit('1')
+      store.enterNumber()
+      store.inputDigit('7')
+      store.performOperation('×')
+      
+      expect(store.stack).toEqual([7])
+    })
+
+    it('should handle large number multiplication', () => {
+      // 999 × 999 = 998001
+      store.inputDigit('9')
+      store.inputDigit('9')
+      store.inputDigit('9')
+      store.enterNumber()
+      store.inputDigit('9')
+      store.inputDigit('9')
+      store.inputDigit('9')
+      store.performOperation('×')
+      
+      expect(store.stack).toEqual([998001])
+    })
+
+    it('should handle very small number multiplication', () => {
+      // 0.001 × 0.001 = 0.000001
+      store.inputDigit('0')
+      store.inputDecimal()
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('1')
+      store.enterNumber()
+      store.inputDigit('0')
+      store.inputDecimal()
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('1')
+      store.performOperation('×')
+      
+      expect(store.stack[0]).toBeCloseTo(0.000001)
+    })
+
+    it('should follow correct RPN order (Y × X)', () => {
+      // Test that 6 × 7 = 42, not 7 × 6 = 42 (same result but verify order)
+      // More importantly: 10 × 2 vs 2 × 10 when order matters in context
+      store.inputDigit('6')
+      store.enterNumber()
+      store.inputDigit('7')
+      store.performOperation('×')
+      
+      expect(store.stack).toEqual([42])
+    })
+
+    it('should handle consecutive multiplications', () => {
+      // 2 × 3 × 4 = 24
+      store.inputDigit('2')
+      store.enterNumber()
+      store.inputDigit('3')
+      store.performOperation('×')
+      expect(store.stack).toEqual([6])
+      
+      store.inputDigit('4')
+      store.performOperation('×')
+      expect(store.stack).toEqual([24])
+    })
+
+    it('should do nothing with empty stack', () => {
+      // No values in stack
+      expect(store.stack).toEqual([])
+      
+      store.performOperation('×')
+      expect(store.stack).toEqual([])
+    })
+
+    it('should do nothing with only one value in stack', () => {
+      // Only one value in stack
+      store.inputDigit('5')
+      store.enterNumber()
+      expect(store.stack).toEqual([5])
+      
+      store.performOperation('×')
+      expect(store.stack).toEqual([5]) // Should remain unchanged
+    })
+
+    it('should automatically enter current input before multiplication', () => {
+      // Test that current input is automatically entered
+      store.inputDigit('5')
+      store.enterNumber()
+      
+      // Start entering new number but don't press Enter
+      store.inputDigit('6')
+      expect(store.inputMode).toBe(true)
+      expect(store.currentInput).toBe('6')
+      
+      // Perform multiplication - should auto-enter 6 first
+      store.performOperation('×')
+      expect(store.stack).toEqual([30]) // 5 × 6 = 30
+      expect(store.inputMode).toBe(false)
+      expect(store.currentInput).toBe('')
+    })
+
+    it('should handle area calculation', () => {
+      // Calculate area: length × width
+      // Example: 12 × 8 = 96
+      store.inputDigit('1')
+      store.inputDigit('2')
+      store.enterNumber()
+      store.inputDigit('8')
+      store.performOperation('×')
+      
+      expect(store.stack).toEqual([96])
+    })
+
+    it('should handle complex calculation with multiplication', () => {
+      // Calculate: (3 + 2) × (4 + 1) = 5 × 5 = 25
+      
+      // First part: 3 + 2 = 5
+      store.inputDigit('3')
+      store.enterNumber()
+      store.inputDigit('2')
+      store.performOperation('+')
+      expect(store.stack).toEqual([5])
+      
+      // Second part: 4 + 1 = 5
+      store.inputDigit('4')
+      store.enterNumber()
+      store.inputDigit('1')
+      store.performOperation('+')
+      expect(store.stack).toEqual([5, 5])
+      
+      // Final multiplication: 5 × 5 = 25
+      store.performOperation('×')
+      expect(store.stack).toEqual([25])
+    })
+
+    it('should handle multiplication in compound calculation', () => {
+      // Calculate: 2 × 3 + 4 = 10
+      store.inputDigit('2')
+      store.enterNumber()
+      store.inputDigit('3')
+      store.performOperation('×')
+      expect(store.stack).toEqual([6])
+      
+      store.inputDigit('4')
+      store.performOperation('+')
+      expect(store.stack).toEqual([10])
+    })
+
+    it('should handle scientific notation results', () => {
+      // Large multiplication that might result in scientific notation
+      store.inputDigit('1')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.enterNumber()
+      store.inputDigit('1')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.performOperation('×')
+      
+      expect(store.stack).toEqual([10000000000])
+    })
+
+    it('should handle fraction multiplication', () => {
+      // 0.5 × 0.25 = 0.125
+      store.inputDigit('0')
+      store.inputDecimal()
+      store.inputDigit('5')
+      store.enterNumber()
+      store.inputDigit('0')
+      store.inputDecimal()
+      store.inputDigit('2')
+      store.inputDigit('5')
+      store.performOperation('×')
+      
+      expect(store.stack).toEqual([0.125])
+    })
+  })
+
+  describe('Subtraction (-) Operation', () => {
+    it('should perform basic subtraction with positive numbers', () => {
+      // 10 - 3 = 7
+      store.inputDigit('1')
+      store.inputDigit('0')
+      store.enterNumber()
+      store.inputDigit('3')
+      store.performOperation('-')
+      
+      expect(store.stack).toEqual([7])
+    })
+
+    it('should perform subtraction with positive number and negative number', () => {
+      // 10 - (-3) = 13
+      store.inputDigit('1')
+      store.inputDigit('0')
+      store.enterNumber()
+      store.inputDigit('3')
+      store.toggleSign()
+      store.performOperation('-')
+      
+      expect(store.stack).toEqual([13])
+    })
+
+    it('should perform subtraction with negative number and positive number', () => {
+      // -10 - 3 = -13
+      store.inputDigit('1')
+      store.inputDigit('0')
+      store.toggleSign()
+      store.enterNumber()
+      store.inputDigit('3')
+      store.performOperation('-')
+      
+      expect(store.stack).toEqual([-13])
+    })
+
+    it('should perform subtraction with both negative numbers', () => {
+      // -10 - (-3) = -7
+      store.inputDigit('1')
+      store.inputDigit('0')
+      store.toggleSign()
+      store.enterNumber()
+      store.inputDigit('3')
+      store.toggleSign()
+      store.performOperation('-')
+      
+      expect(store.stack).toEqual([-7])
+    })
+
+    it('should perform subtraction with decimal numbers', () => {
+      // 5.5 - 2.3 = 3.2
+      store.inputDigit('5')
+      store.inputDecimal()
+      store.inputDigit('5')
+      store.enterNumber()
+      store.inputDigit('2')
+      store.inputDecimal()
+      store.inputDigit('3')
+      store.performOperation('-')
+      
+      expect(store.stack[0]).toBeCloseTo(3.2)
+    })
+
+    it('should perform subtraction with integer and decimal', () => {
+      // 10 - 2.5 = 7.5
+      store.inputDigit('1')
+      store.inputDigit('0')
+      store.enterNumber()
+      store.inputDigit('2')
+      store.inputDecimal()
+      store.inputDigit('5')
+      store.performOperation('-')
+      
+      expect(store.stack).toEqual([7.5])
+    })
+
+    it('should perform subtraction with decimal and integer', () => {
+      // 7.5 - 2 = 5.5
+      store.inputDigit('7')
+      store.inputDecimal()
+      store.inputDigit('5')
+      store.enterNumber()
+      store.inputDigit('2')
+      store.performOperation('-')
+      
+      expect(store.stack).toEqual([5.5])
+    })
+
+    it('should subtract from zero', () => {
+      // 0 - 5 = -5
+      store.inputDigit('0')
+      store.enterNumber()
+      store.inputDigit('5')
+      store.performOperation('-')
+      
+      expect(store.stack).toEqual([-5])
+    })
+
+    it('should subtract zero from a number', () => {
+      // 5 - 0 = 5
+      store.inputDigit('5')
+      store.enterNumber()
+      store.inputDigit('0')
+      store.performOperation('-')
+      
+      expect(store.stack).toEqual([5])
+    })
+
+    it('should subtract same numbers (result zero)', () => {
+      // 5 - 5 = 0
+      store.inputDigit('5')
+      store.enterNumber()
+      store.inputDigit('5')
+      store.performOperation('-')
+      
+      expect(store.stack).toEqual([0])
+    })
+
+    it('should follow correct RPN order (Y - X)', () => {
+      // Critical test: 10 - 3 = 7 (not 3 - 10 = -7)
+      // Stack before operation: [10, 3] (Y=10, X=3)
+      // Result should be Y - X = 10 - 3 = 7
+      store.inputDigit('1')
+      store.inputDigit('0')
+      store.enterNumber()
+      store.inputDigit('3')
+      store.performOperation('-')
+      
+      expect(store.stack).toEqual([7])
+    })
+
+    it('should verify RPN order with different numbers', () => {
+      // 20 - 8 = 12 (not 8 - 20 = -12)
+      store.inputDigit('2')
+      store.inputDigit('0')
+      store.enterNumber()
+      store.inputDigit('8')
+      store.performOperation('-')
+      
+      expect(store.stack).toEqual([12])
+    })
+
+    it('should demonstrate order importance with negative result', () => {
+      // 5 - 10 = -5 (order matters)
+      store.inputDigit('5')
+      store.enterNumber()
+      store.inputDigit('1')
+      store.inputDigit('0')
+      store.performOperation('-')
+      
+      expect(store.stack).toEqual([-5])
+    })
+
+    it('should handle consecutive subtractions', () => {
+      // 20 - 5 - 3 = 12
+      store.inputDigit('2')
+      store.inputDigit('0')
+      store.enterNumber()
+      store.inputDigit('5')
+      store.performOperation('-')
+      expect(store.stack).toEqual([15])
+      
+      store.inputDigit('3')
+      store.performOperation('-')
+      expect(store.stack).toEqual([12])
+    })
+
+    it('should handle consecutive subtractions with different order', () => {
+      // Show how RPN handles: (10 - 3) - 2 = 5
+      store.inputDigit('1')
+      store.inputDigit('0')
+      store.enterNumber()
+      store.inputDigit('3')
+      store.performOperation('-')
+      expect(store.stack).toEqual([7])
+      
+      store.inputDigit('2')
+      store.performOperation('-')
+      expect(store.stack).toEqual([5])
+    })
+
+    it('should do nothing with empty stack', () => {
+      // No values in stack
+      expect(store.stack).toEqual([])
+      
+      store.performOperation('-')
+      expect(store.stack).toEqual([])
+    })
+
+    it('should do nothing with only one value in stack', () => {
+      // Only one value in stack
+      store.inputDigit('5')
+      store.enterNumber()
+      expect(store.stack).toEqual([5])
+      
+      store.performOperation('-')
+      expect(store.stack).toEqual([5]) // Should remain unchanged
+    })
+
+    it('should automatically enter current input before subtraction', () => {
+      // Test that current input is automatically entered
+      store.inputDigit('1')
+      store.inputDigit('0')
+      store.enterNumber()
+      
+      // Start entering new number but don't press Enter
+      store.inputDigit('3')
+      expect(store.inputMode).toBe(true)
+      expect(store.currentInput).toBe('3')
+      
+      // Perform subtraction - should auto-enter 3 first
+      store.performOperation('-')
+      expect(store.stack).toEqual([7]) // 10 - 3 = 7
+      expect(store.inputMode).toBe(false)
+      expect(store.currentInput).toBe('')
+    })
+
+    it('should handle temperature difference calculation', () => {
+      // High temp - Low temp = difference
+      // Example: 25°C - 18°C = 7°C difference
+      store.inputDigit('2')
+      store.inputDigit('5')
+      store.enterNumber()
+      store.inputDigit('1')
+      store.inputDigit('8')
+      store.performOperation('-')
+      
+      expect(store.stack).toEqual([7])
+    })
+
+    it('should handle complex calculation with subtraction', () => {
+      // Calculate: (15 + 5) - (8 - 3) = 20 - 5 = 15
+      
+      // First part: 15 + 5 = 20
+      store.inputDigit('1')
+      store.inputDigit('5')
+      store.enterNumber()
+      store.inputDigit('5')
+      store.performOperation('+')
+      expect(store.stack).toEqual([20])
+      
+      // Second part: 8 - 3 = 5
+      store.inputDigit('8')
+      store.enterNumber()
+      store.inputDigit('3')
+      store.performOperation('-')
+      expect(store.stack).toEqual([20, 5])
+      
+      // Final subtraction: 20 - 5 = 15
+      store.performOperation('-')
+      expect(store.stack).toEqual([15])
+    })
+
+    it('should handle subtraction in compound calculation', () => {
+      // Calculate: 20 - 3 × 2 = 20 - 6 = 14 (RPN order)
+      // Note: In RPN this becomes: 3 2 × 20 swap - or 20 3 2 × -
+      
+      store.inputDigit('2')
+      store.inputDigit('0')
+      store.enterNumber()
+      store.inputDigit('3')
+      store.enterNumber()
+      store.inputDigit('2')
+      store.performOperation('×')
+      expect(store.stack).toEqual([20, 6])
+      
+      store.performOperation('-')
+      expect(store.stack).toEqual([14])
+    })
+
+    it('should preserve precision with decimal subtraction', () => {
+      // 1.1 - 0.1 should handle floating point precision
+      store.inputDigit('1')
+      store.inputDecimal()
+      store.inputDigit('1')
+      store.enterNumber()
+      store.inputDigit('0')
+      store.inputDecimal()
+      store.inputDigit('1')
+      store.performOperation('-')
+      
+      expect(store.stack[0]).toBeCloseTo(1.0)
+    })
+
+    it('should handle very small number subtraction', () => {
+      // 0.000001 - 0.0000001 = 0.0000009
+      store.inputDigit('0')
+      store.inputDecimal()
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('1')
+      store.enterNumber()
+      store.inputDigit('0')
+      store.inputDecimal()
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('1')
+      store.performOperation('-')
+      
+      expect(store.stack[0]).toBeCloseTo(0.0000009)
+    })
+
+    it('should handle large number subtraction', () => {
+      // 1000000 - 999999 = 1
+      store.inputDigit('1')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.enterNumber()
+      store.inputDigit('9')
+      store.inputDigit('9')
+      store.inputDigit('9')
+      store.inputDigit('9')
+      store.inputDigit('9')
+      store.inputDigit('9')
+      store.performOperation('-')
+      
+      expect(store.stack).toEqual([1])
+    })
+
+    it('should handle age difference calculation', () => {
+      // Older age - Younger age = age difference
+      // Example: 45 - 23 = 22 years difference
+      store.inputDigit('4')
+      store.inputDigit('5')
+      store.enterNumber()
+      store.inputDigit('2')
+      store.inputDigit('3')
+      store.performOperation('-')
+      
+      expect(store.stack).toEqual([22])
+    })
+  })
+
+  describe('Addition (+) Operation', () => {
+    it('should perform basic addition with positive numbers', () => {
+      // 3 + 5 = 8
+      store.inputDigit('3')
+      store.enterNumber()
+      store.inputDigit('5')
+      store.performOperation('+')
+      
+      expect(store.stack).toEqual([8])
+    })
+
+    it('should perform addition with positive and negative numbers', () => {
+      // 10 + (-3) = 7
+      store.inputDigit('1')
+      store.inputDigit('0')
+      store.enterNumber()
+      store.inputDigit('3')
+      store.toggleSign()
+      store.performOperation('+')
+      
+      expect(store.stack).toEqual([7])
+    })
+
+    it('should perform addition with negative and positive numbers', () => {
+      // -10 + 3 = -7
+      store.inputDigit('1')
+      store.inputDigit('0')
+      store.toggleSign()
+      store.enterNumber()
+      store.inputDigit('3')
+      store.performOperation('+')
+      
+      expect(store.stack).toEqual([-7])
+    })
+
+    it('should perform addition with both negative numbers', () => {
+      // -5 + (-3) = -8
+      store.inputDigit('5')
+      store.toggleSign()
+      store.enterNumber()
+      store.inputDigit('3')
+      store.toggleSign()
+      store.performOperation('+')
+      
+      expect(store.stack).toEqual([-8])
+    })
+
+    it('should perform addition with decimal numbers', () => {
+      // 2.5 + 3.7 = 6.2
+      store.inputDigit('2')
+      store.inputDecimal()
+      store.inputDigit('5')
+      store.enterNumber()
+      store.inputDigit('3')
+      store.inputDecimal()
+      store.inputDigit('7')
+      store.performOperation('+')
+      
+      expect(store.stack[0]).toBeCloseTo(6.2)
+    })
+
+    it('should perform addition with integer and decimal', () => {
+      // 5 + 2.5 = 7.5
+      store.inputDigit('5')
+      store.enterNumber()
+      store.inputDigit('2')
+      store.inputDecimal()
+      store.inputDigit('5')
+      store.performOperation('+')
+      
+      expect(store.stack).toEqual([7.5])
+    })
+
+    it('should perform addition with decimal and integer', () => {
+      // 3.5 + 4 = 7.5
+      store.inputDigit('3')
+      store.inputDecimal()
+      store.inputDigit('5')
+      store.enterNumber()
+      store.inputDigit('4')
+      store.performOperation('+')
+      
+      expect(store.stack).toEqual([7.5])
+    })
+
+    it('should add zero to a number (additive identity)', () => {
+      // 5 + 0 = 5
+      store.inputDigit('5')
+      store.enterNumber()
+      store.inputDigit('0')
+      store.performOperation('+')
+      
+      expect(store.stack).toEqual([5])
+    })
+
+    it('should add a number to zero', () => {
+      // 0 + 5 = 5
+      store.inputDigit('0')
+      store.enterNumber()
+      store.inputDigit('5')
+      store.performOperation('+')
+      
+      expect(store.stack).toEqual([5])
+    })
+
+    it('should add same positive numbers', () => {
+      // 7 + 7 = 14
+      store.inputDigit('7')
+      store.enterNumber()
+      store.inputDigit('7')
+      store.performOperation('+')
+      
+      expect(store.stack).toEqual([14])
+    })
+
+    it('should add opposite numbers (result zero)', () => {
+      // 5 + (-5) = 0
+      store.inputDigit('5')
+      store.enterNumber()
+      store.inputDigit('5')
+      store.toggleSign()
+      store.performOperation('+')
+      
+      expect(store.stack).toEqual([0])
+    })
+
+    it('should demonstrate commutative property (Y + X = X + Y conceptually)', () => {
+      // While RPN order is Y + X, addition is commutative so 3 + 5 = 8
+      store.inputDigit('3')
+      store.enterNumber()
+      store.inputDigit('5')
+      store.performOperation('+')
+      expect(store.stack).toEqual([8])
+      
+      // Reset and try reverse order (5 + 3 should also equal 8)
+      store.clearAll()
+      store.inputDigit('5')
+      store.enterNumber()
+      store.inputDigit('3')
+      store.performOperation('+')
+      expect(store.stack).toEqual([8])
+    })
+
+    it('should handle consecutive additions', () => {
+      // 2 + 3 + 4 = 9
+      store.inputDigit('2')
+      store.enterNumber()
+      store.inputDigit('3')
+      store.performOperation('+')
+      expect(store.stack).toEqual([5])
+      
+      store.inputDigit('4')
+      store.performOperation('+')
+      expect(store.stack).toEqual([9])
+    })
+
+    it('should handle multiple consecutive additions', () => {
+      // 1 + 2 + 3 + 4 = 10
+      store.inputDigit('1')
+      store.enterNumber()
+      store.inputDigit('2')
+      store.performOperation('+')
+      expect(store.stack).toEqual([3])
+      
+      store.inputDigit('3')
+      store.performOperation('+')
+      expect(store.stack).toEqual([6])
+      
+      store.inputDigit('4')
+      store.performOperation('+')
+      expect(store.stack).toEqual([10])
+    })
+
+    it('should handle large number addition', () => {
+      // 999999 + 1 = 1000000
+      store.inputDigit('9')
+      store.inputDigit('9')
+      store.inputDigit('9')
+      store.inputDigit('9')
+      store.inputDigit('9')
+      store.inputDigit('9')
+      store.enterNumber()
+      store.inputDigit('1')
+      store.performOperation('+')
+      
+      expect(store.stack).toEqual([1000000])
+    })
+
+    it('should handle very small number addition', () => {
+      // 0.000001 + 0.000002 = 0.000003
+      store.inputDigit('0')
+      store.inputDecimal()
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('1')
+      store.enterNumber()
+      store.inputDigit('0')
+      store.inputDecimal()
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.inputDigit('2')
+      store.performOperation('+')
+      
+      expect(store.stack[0]).toBeCloseTo(0.000003)
+    })
+
+    it('should do nothing with empty stack', () => {
+      // No values in stack
+      expect(store.stack).toEqual([])
+      
+      store.performOperation('+')
+      expect(store.stack).toEqual([])
+    })
+
+    it('should do nothing with only one value in stack', () => {
+      // Only one value in stack
+      store.inputDigit('5')
+      store.enterNumber()
+      expect(store.stack).toEqual([5])
+      
+      store.performOperation('+')
+      expect(store.stack).toEqual([5]) // Should remain unchanged
+    })
+
+    it('should automatically enter current input before addition', () => {
+      // Test that current input is automatically entered
+      store.inputDigit('7')
+      store.enterNumber()
+      
+      // Start entering new number but don't press Enter
+      store.inputDigit('3')
+      expect(store.inputMode).toBe(true)
+      expect(store.currentInput).toBe('3')
+      
+      // Perform addition - should auto-enter 3 first
+      store.performOperation('+')
+      expect(store.stack).toEqual([10]) // 7 + 3 = 10
+      expect(store.inputMode).toBe(false)
+      expect(store.currentInput).toBe('')
+    })
+
+    it('should handle sum calculation', () => {
+      // Calculate sum of multiple values: 12 + 8 + 5 = 25
+      store.inputDigit('1')
+      store.inputDigit('2')
+      store.enterNumber()
+      store.inputDigit('8')
+      store.performOperation('+')
+      expect(store.stack).toEqual([20])
+      
+      store.inputDigit('5')
+      store.performOperation('+')
+      expect(store.stack).toEqual([25])
+    })
+
+    it('should handle complex calculation with addition', () => {
+      // Calculate: (3 × 2) + (4 × 5) = 6 + 20 = 26
+      
+      // First part: 3 × 2 = 6
+      store.inputDigit('3')
+      store.enterNumber()
+      store.inputDigit('2')
+      store.performOperation('×')
+      expect(store.stack).toEqual([6])
+      
+      // Second part: 4 × 5 = 20
+      store.inputDigit('4')
+      store.enterNumber()
+      store.inputDigit('5')
+      store.performOperation('×')
+      expect(store.stack).toEqual([6, 20])
+      
+      // Final addition: 6 + 20 = 26
+      store.performOperation('+')
+      expect(store.stack).toEqual([26])
+    })
+
+    it('should handle addition in compound calculation', () => {
+      // Calculate: 5 + 3 × 2 = 5 + 6 = 11 (RPN order)
+      store.inputDigit('5')
+      store.enterNumber()
+      store.inputDigit('3')
+      store.enterNumber()
+      store.inputDigit('2')
+      store.performOperation('×')
+      expect(store.stack).toEqual([5, 6])
+      
+      store.performOperation('+')
+      expect(store.stack).toEqual([11])
+    })
+
+    it('should preserve precision with decimal addition', () => {
+      // 0.1 + 0.2 should handle floating point precision
+      store.inputDigit('0')
+      store.inputDecimal()
+      store.inputDigit('1')
+      store.enterNumber()
+      store.inputDigit('0')
+      store.inputDecimal()
+      store.inputDigit('2')
+      store.performOperation('+')
+      
+      expect(store.stack[0]).toBeCloseTo(0.3)
+    })
+
+    it('should handle running total calculation', () => {
+      // Running total: start with 100, add 25, add 50, add 10 = 185
+      store.inputDigit('1')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.enterNumber()
+      store.inputDigit('2')
+      store.inputDigit('5')
+      store.performOperation('+')
+      expect(store.stack).toEqual([125])
+      
+      store.inputDigit('5')
+      store.inputDigit('0')
+      store.performOperation('+')
+      expect(store.stack).toEqual([175])
+      
+      store.inputDigit('1')
+      store.inputDigit('0')
+      store.performOperation('+')
+      expect(store.stack).toEqual([185])
+    })
+
+    it('should handle score calculation', () => {
+      // Calculate total score: 85 + 92 + 78 = 255
+      store.inputDigit('8')
+      store.inputDigit('5')
+      store.enterNumber()
+      store.inputDigit('9')
+      store.inputDigit('2')
+      store.performOperation('+')
+      expect(store.stack).toEqual([177])
+      
+      store.inputDigit('7')
+      store.inputDigit('8')
+      store.performOperation('+')
+      expect(store.stack).toEqual([255])
+    })
+
+    it('should handle negative and positive balance calculation', () => {
+      // Balance calculation: -50 + 100 + (-25) + 75 = 100
+      store.inputDigit('5')
+      store.inputDigit('0')
+      store.toggleSign()
+      store.enterNumber()
+      store.inputDigit('1')
+      store.inputDigit('0')
+      store.inputDigit('0')
+      store.performOperation('+')
+      expect(store.stack).toEqual([50])
+      
+      store.inputDigit('2')
+      store.inputDigit('5')
+      store.toggleSign()
+      store.performOperation('+')
+      expect(store.stack).toEqual([25])
+      
+      store.inputDigit('7')
+      store.inputDigit('5')
+      store.performOperation('+')
+      expect(store.stack).toEqual([100])
+    })
+
+    it('should handle addition with very large numbers', () => {
+      // Test scientific notation handling
+      store.inputDigit('9')
+      store.inputDigit('9')
+      store.inputDigit('9')
+      store.inputDigit('9')
+      store.inputDigit('9')
+      store.inputDigit('9')
+      store.inputDigit('9')
+      store.inputDigit('9')
+      store.inputDigit('9')
+      store.enterNumber()
+      store.inputDigit('1')
+      store.performOperation('+')
+      
+      expect(store.stack).toEqual([1000000000])
+    })
+  })
+
+  describe('Toggle Sign (+/-) Functionality', () => {
+    it('should add minus sign to positive number input', () => {
+      store.inputDigit('5')
+      expect(store.currentInput).toBe('5')
+      expect(store.inputMode).toBe(true)
+      
+      store.toggleSign()
+      expect(store.currentInput).toBe('-5')
+      expect(store.inputMode).toBe(true)
+    })
+
+    it('should remove minus sign from negative number input', () => {
+      store.inputDigit('5')
+      store.toggleSign()
+      expect(store.currentInput).toBe('-5')
+      
+      store.toggleSign()
+      expect(store.currentInput).toBe('5')
+    })
+
+    it('should do nothing when not in input mode', () => {
+      // No current input
+      expect(store.inputMode).toBe(false)
+      expect(store.currentInput).toBe('')
+      
+      store.toggleSign()
+      expect(store.currentInput).toBe('')
+      expect(store.inputMode).toBe(false)
+    })
+
+    it('should do nothing with empty input string', () => {
+      // Start input mode but don't enter anything
+      store.inputDecimal() // This starts input mode with "0."
+      store.deleteLastDigit() // Remove the "."
+      store.deleteLastDigit() // Remove the "0"
+      expect(store.inputMode).toBe(false)
+      expect(store.currentInput).toBe('')
+      
+      store.toggleSign()
+      expect(store.currentInput).toBe('')
+      expect(store.inputMode).toBe(false)
+    })
+
+    it('should work with decimal numbers', () => {
+      store.inputDigit('3')
+      store.inputDecimal()
+      store.inputDigit('1')
+      store.inputDigit('4')
+      expect(store.currentInput).toBe('3.14')
+      
+      store.toggleSign()
+      expect(store.currentInput).toBe('-3.14')
+      
+      store.toggleSign()
+      expect(store.currentInput).toBe('3.14')
+    })
+
+    it('should work with zero', () => {
+      store.inputDigit('0')
+      expect(store.currentInput).toBe('0')
+      
+      store.toggleSign()
+      expect(store.currentInput).toBe('-0')
+      
+      store.toggleSign()
+      expect(store.currentInput).toBe('0')
+    })
+
+    it('should work with decimal point only', () => {
+      store.inputDecimal()
+      expect(store.currentInput).toBe('0.')
+      
+      store.toggleSign()
+      expect(store.currentInput).toBe('-0.')
+      
+      store.toggleSign()
+      expect(store.currentInput).toBe('0.')
+    })
+
+    it('should allow multiple consecutive toggles', () => {
+      store.inputDigit('1')
+      store.inputDigit('2')
+      store.inputDigit('3')
+      expect(store.currentInput).toBe('123')
+      
+      // Multiple toggles
+      store.toggleSign()
+      expect(store.currentInput).toBe('-123')
+      
+      store.toggleSign()
+      expect(store.currentInput).toBe('123')
+      
+      store.toggleSign()
+      expect(store.currentInput).toBe('-123')
+      
+      store.toggleSign()
+      expect(store.currentInput).toBe('123')
+    })
+
+    it('should enter negative numbers into stack correctly', () => {
+      store.inputDigit('7')
+      store.toggleSign()
+      expect(store.currentInput).toBe('-7')
+      
+      store.enterNumber()
+      expect(store.stack).toEqual([-7])
+      expect(store.currentInput).toBe('')
+      expect(store.inputMode).toBe(false)
+    })
+
+    it('should perform calculations with negative numbers', () => {
+      // Enter positive number
+      store.inputDigit('1')
+      store.inputDigit('0')
+      store.enterNumber()
+      expect(store.stack).toEqual([10])
+      
+      // Enter negative number
+      store.inputDigit('3')
+      store.toggleSign()
+      expect(store.currentInput).toBe('-3')
+      
+      // Add: 10 + (-3) = 7
+      store.performOperation('+')
+      expect(store.stack).toEqual([7])
+    })
+
+    it('should handle negative number operations', () => {
+      // Enter negative number: -5
+      store.inputDigit('5')
+      store.toggleSign()
+      store.enterNumber()
+      expect(store.stack).toEqual([-5])
+      
+      // Enter positive number: 8
+      store.inputDigit('8')
+      store.enterNumber()
+      expect(store.stack).toEqual([-5, 8])
+      
+      // Subtract: -5 - 8 = -13
+      store.performOperation('-')
+      expect(store.stack).toEqual([-13])
+    })
+
+    it('should work with sign change during decimal input', () => {
+      store.inputDigit('2')
+      store.inputDecimal()
+      expect(store.currentInput).toBe('2.')
+      
+      store.toggleSign()
+      expect(store.currentInput).toBe('-2.')
+      
+      store.inputDigit('5')
+      expect(store.currentInput).toBe('-2.5')
+      
+      store.toggleSign()
+      expect(store.currentInput).toBe('2.5')
+      
+      store.enterNumber()
+      expect(store.stack).toEqual([2.5])
+    })
+
+    it('should preserve sign after additional digit input', () => {
+      store.inputDigit('1')
+      store.toggleSign()
+      expect(store.currentInput).toBe('-1')
+      
+      // Continue entering digits
+      store.inputDigit('2')
+      store.inputDigit('3')
+      expect(store.currentInput).toBe('-123')
+      
+      store.enterNumber()
+      expect(store.stack).toEqual([-123])
+    })
+  })
+
+  describe('EEX (Enter Exponent) Functionality', () => {
+    it('should convert positive integer to power of 10', () => {
+      // 3 EEX -> 10^3 = 1000
+      store.inputDigit('3')
+      expect(store.currentInput).toBe('3')
+      expect(store.inputMode).toBe(true)
+      
+      store.applyEEX()
+      expect(store.currentInput).toBe('1000')
+      expect(store.inputMode).toBe(true)
+    })
+
+    it('should convert zero to 1 (10^0)', () => {
+      // 0 EEX -> 10^0 = 1
+      store.inputDigit('0')
+      store.applyEEX()
+      expect(store.currentInput).toBe('1')
+    })
+
+    it('should convert negative integer to small decimal', () => {
+      // -3 EEX -> 10^(-3) = 0.001
+      store.inputDigit('3')
+      store.toggleSign()
+      expect(store.currentInput).toBe('-3')
+      
+      store.applyEEX()
+      expect(store.currentInput).toBe('0.001')
+    })
+
+    it('should handle EEX with decimal exponents', () => {
+      // 2.5 EEX -> 10^2.5 ≈ 316.227766
+      store.inputDigit('2')
+      store.inputDecimal()
+      store.inputDigit('5')
+      expect(store.currentInput).toBe('2.5')
+      
+      store.applyEEX()
+      const result = parseFloat(store.currentInput)
+      expect(result).toBeCloseTo(316.227766, 5)
+    })
+
+    it('should handle EEX with negative decimal exponents', () => {
+      // -2.5 EEX -> 10^(-2.5) ≈ 0.00316227766
+      store.inputDigit('2')
+      store.inputDecimal()
+      store.inputDigit('5')
+      store.toggleSign()
+      expect(store.currentInput).toBe('-2.5')
+      
+      store.applyEEX()
+      const result = parseFloat(store.currentInput)
+      expect(result).toBeCloseTo(0.00316227766, 8)
+    })
+
+    it('should handle large positive exponents', () => {
+      // 6 EEX -> 10^6 = 1000000
+      store.inputDigit('6')
+      store.applyEEX()
+      expect(store.currentInput).toBe('1000000')
+    })
+
+    it('should handle large negative exponents', () => {
+      // -6 EEX -> 10^(-6) = 0.000001
+      store.inputDigit('6')
+      store.toggleSign()
+      store.applyEEX()
+      expect(store.currentInput).toBe('0.000001')
+    })
+
+    it('should do nothing when not in input mode', () => {
+      // No input entered, not in input mode
+      expect(store.inputMode).toBe(false)
+      expect(store.currentInput).toBe('')
+      
+      store.applyEEX()
+      expect(store.inputMode).toBe(false)
+      expect(store.currentInput).toBe('')
+    })
+
+    it('should do nothing when current input is empty', () => {
+      // Start input mode but delete all content
+      store.inputDigit('5')
+      store.deleteLastDigit()
+      expect(store.inputMode).toBe(false)
+      expect(store.currentInput).toBe('')
+      
+      store.applyEEX()
+      expect(store.inputMode).toBe(false)
+      expect(store.currentInput).toBe('')
+    })
+
+    it('should handle EEX followed by Enter', () => {
+      // 2 EEX Enter -> should push 100 to stack
+      store.inputDigit('2')
+      store.applyEEX()
+      expect(store.currentInput).toBe('100')
+      
+      store.enterNumber()
+      expect(store.stack).toEqual([100])
+      expect(store.currentInput).toBe('')
+      expect(store.inputMode).toBe(false)
+    })
+
+    it('should work in calculations', () => {
+      // Calculate: 3 EEX + 1 = 1000 + 1 = 1001
+      store.inputDigit('3')
+      store.applyEEX()
+      expect(store.currentInput).toBe('1000')
+      
+      store.enterNumber()
+      store.inputDigit('1')
+      store.performOperation('+')
+      expect(store.stack).toEqual([1001])
+    })
+
+    it('should handle consecutive EEX operations', () => {
+      // 2 EEX EEX -> 10^2 = 100, then 10^100 (very large number)
+      store.inputDigit('2')
+      store.applyEEX()
+      expect(store.currentInput).toBe('100')
+      
+      // Apply EEX again: 10^100
+      store.applyEEX()
+      const result = parseFloat(store.currentInput)
+      expect(result).toBe(Math.pow(10, 100))
+    })
+
+    it('should handle EEX with fractional results', () => {
+      // 0.5 EEX -> 10^0.5 ≈ 3.162277660168379
+      store.inputDigit('0')
+      store.inputDecimal()
+      store.inputDigit('5')
+      store.applyEEX()
+      
+      const result = parseFloat(store.currentInput)
+      expect(result).toBeCloseTo(3.162277660168379, 10)
+    })
+
+    it('should handle EEX with very small fractional exponents', () => {
+      // 0.1 EEX -> 10^0.1 ≈ 1.2589254117941673
+      store.inputDigit('0')
+      store.inputDecimal()
+      store.inputDigit('1')
+      store.applyEEX()
+      
+      const result = parseFloat(store.currentInput)
+      expect(result).toBeCloseTo(1.2589254117941673, 10)
+    })
+
+    it('should handle EEX in scientific calculation workflow', () => {
+      // Simulate: 6.02 × 10^23 (Avogadro's number)
+      // Input: 6.02 Enter 23 EEX × = 6.02 × 10^23
+      
+      store.inputDigit('6')
+      store.inputDecimal()
+      store.inputDigit('0')
+      store.inputDigit('2')
+      store.enterNumber()
+      expect(store.stack).toEqual([6.02])
+      
+      store.inputDigit('2')
+      store.inputDigit('3')
+      store.applyEEX()
+      // Very large numbers are displayed in scientific notation
+      expect(store.currentInput).toBe('1e+23')
+      
+      store.performOperation('×')
+      expect(store.stack[0]).toBeCloseTo(6.02e23, -18) // Very large number comparison
+    })
+
+    it('should preserve input mode after EEX operation', () => {
+      // EEX should keep the calculator in input mode for further editing
+      store.inputDigit('1')
+      expect(store.inputMode).toBe(true)
+      
+      store.applyEEX()
+      expect(store.inputMode).toBe(true)
+      expect(store.currentInput).toBe('10')
+      
+      // Should be able to continue editing (though this might not be typical usage)
+      store.inputDigit('5')
+      expect(store.currentInput).toBe('105')
+    })
+
+    it('should handle EEX with stack operations', () => {
+      // Test EEX in context of stack manipulation
+      // 1 Enter 2 EEX Swap -> should have 100 in Y and 1 in X
+      
+      store.inputDigit('1')
+      store.enterNumber()
+      store.inputDigit('2')
+      store.applyEEX()
+      store.enterNumber()
+      expect(store.stack).toEqual([1, 100])
+      
+      store.swapStack()
+      expect(store.stack).toEqual([100, 1])
+    })
+
+    it('should handle edge case with negative zero', () => {
+      // -0 EEX -> should still result in 1 (10^-0 = 10^0 = 1)
+      store.inputDigit('0')
+      store.toggleSign()
+      expect(store.currentInput).toBe('-0')
+      
+      store.applyEEX()
+      expect(store.currentInput).toBe('1')
+    })
+
+    it('should handle very large exponents gracefully', () => {
+      // 10 EEX -> 10^10 = 10000000000
+      store.inputDigit('1')
+      store.inputDigit('0')
+      store.applyEEX()
+      expect(store.currentInput).toBe('10000000000')
+    })
+  })
+
   describe('Real-world HP Calculator Scenarios', () => {
     it('should handle classic HP example: 15 Enter 7 - 2 /', () => {
       // 15 Enter
@@ -421,6 +2095,28 @@ describe('RPN Calculator Store - HP-style Stack Lift', () => {
       
       store.performOperation('×')
       expect(store.stack).toEqual([40]) // 8 * 5 = 40
+    })
+
+    it('should handle calculations with negative numbers', () => {
+      // Calculate: -15 + 20 - 3 = 2
+      
+      // Enter -15
+      store.inputDigit('1')
+      store.inputDigit('5')
+      store.toggleSign()
+      store.enterNumber()
+      expect(store.stack).toEqual([-15])
+      
+      // Add 20: -15 + 20 = 5
+      store.inputDigit('2')
+      store.inputDigit('0')
+      store.performOperation('+')
+      expect(store.stack).toEqual([5])
+      
+      // Subtract 3: 5 - 3 = 2
+      store.inputDigit('3')
+      store.performOperation('-')
+      expect(store.stack).toEqual([2])
     })
   })
 })
