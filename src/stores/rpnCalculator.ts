@@ -8,6 +8,15 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
   const currentInput = ref<string>('')
   const inputMode = ref<boolean>(false)
   const history = ref<HistoryItem[]>([])
+  const lastOperationWasEnter = ref<boolean>(false)
+
+  // Helper function for HP-style stack lift
+  const liftStack = () => {
+    // Limit stack to 4 levels (T, Z, Y, X)
+    if (stack.value.length >= 4) {
+      stack.value = stack.value.slice(1) // Remove T (oldest value)
+    }
+  }
 
   // Computed
   const displayStack = computed(() => {
@@ -44,6 +53,7 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
 
   // Actions
   const inputDigit = (digit: string) => {
+    lastOperationWasEnter.value = false
     if (!inputMode.value) {
       currentInput.value = digit
       inputMode.value = true
@@ -53,6 +63,7 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
   }
 
   const inputDecimal = () => {
+    lastOperationWasEnter.value = false
     if (!inputMode.value) {
       currentInput.value = '0.'
       inputMode.value = true
@@ -62,13 +73,24 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
   }
 
   const enterNumber = () => {
-    if (inputMode.value && currentInput.value) {
+    if (inputMode.value && currentInput.value !== '') {
+      // New number input: perform stack lift and push new number
       const number = parseFloat(currentInput.value)
       if (!isNaN(number)) {
+        saveToHistory('stack_operation', 'enter')
+        liftStack()
         stack.value.push(number)
         currentInput.value = ''
         inputMode.value = false
+        lastOperationWasEnter.value = true
       }
+    } else if (!inputMode.value && stack.value.length > 0) {
+      // No input but stack has values: always duplicate X register (allow consecutive Enter)
+      saveToHistory('stack_operation', 'enter_duplicate')
+      const xValue = stack.value[stack.value.length - 1]
+      liftStack()
+      stack.value.push(xValue)
+      lastOperationWasEnter.value = true
     }
   }
 
@@ -105,6 +127,7 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
     }
 
     stack.value.push(result)
+    lastOperationWasEnter.value = false
   }
 
   const toggleSign = () => {
@@ -131,6 +154,7 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
     if (stack.value.length > 0) {
       saveToHistory('stack_operation', 'drop')
       stack.value.pop()
+      lastOperationWasEnter.value = false
     }
   }
 
@@ -140,6 +164,7 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
       const a = stack.value.pop()!
       const b = stack.value.pop()!
       stack.value.push(a, b)
+      lastOperationWasEnter.value = false
     }
   }
 
@@ -158,6 +183,7 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
       stack.value = [...lastItem.previousStack]
       currentInput.value = lastItem.previousInput
       inputMode.value = lastItem.previousInput !== ''
+      lastOperationWasEnter.value = false
     }
   }
 
@@ -166,6 +192,7 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
     currentInput.value = ''
     inputMode.value = false
     history.value = []
+    lastOperationWasEnter.value = false
   }
 
   return {
@@ -174,6 +201,7 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
     currentInput,
     inputMode,
     history,
+    lastOperationWasEnter,
     
     // Computed
     displayStack,

@@ -1,6 +1,13 @@
 <template>
   <div class="calculator-display">
-    <!-- Stack values (up to 4, oldest at top) -->
+    <!-- Empty slots to maintain 4-row layout (at top for older stack levels) -->
+    <div
+      v-for="i in emptySlots"
+      :key="`empty-${i}`"
+      class="stack-item empty"
+    />
+    
+    <!-- Stack values (up to 4, X register at bottom) -->
     <div
       v-for="(value, index) in displayValues"
       :key="`stack-${index}`"
@@ -8,13 +15,6 @@
     >
       {{ formatNumber(value) }}
     </div>
-    
-    <!-- Empty slots to maintain 4-row layout -->
-    <div
-      v-for="i in emptySlots"
-      :key="`empty-${i}`"
-      class="stack-item empty"
-    />
   </div>
 </template>
 
@@ -38,7 +38,7 @@ const displayValues = computed(() => {
     result.push(inputNum)
   }
   
-  // Show only the last 4 values (newest at bottom)
+  // Show only the last 4 values (X register at bottom)
   return result.slice(-4)
 })
 
