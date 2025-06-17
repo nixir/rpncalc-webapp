@@ -29,8 +29,8 @@ const stackDisplay = computed(() => {
   
   // Add current input as the last item if in input mode
   if (props.inputMode && props.currentInput) {
-    const inputNum = parseFloat(props.currentInput) || 0
-    values.push(inputNum)
+    // Convert to number for stack consistency
+    values.push(parseFloat(props.currentInput))
   }
   
   // Get the last 4 values (or fewer if stack is smaller)
@@ -48,7 +48,7 @@ const stackDisplay = computed(() => {
     
     return {
       label,
-      value: value !== null ? formatNumber(value) : '',
+      value: value !== null ? (isCurrentInput ? props.currentInput : formatNumber(value)) : '',
       isCurrentInput
     }
   })

@@ -105,16 +105,49 @@ test.describe('RPN Calculator - Main Functions', () => {
     await page.getByRole('button', { name: '.' }).click()
     await page.getByRole('button', { name: '2' }).click()
     await page.getByRole('button', { name: '3' }).click()
+    
+    // 基数入力後の表示確認
+    await expect(page.locator('.stack-item.current-input .stack-value')).toHaveText('1.23')
 
     // EEXボタンで指数モード
     await page.getByRole('button', { name: 'EEX' }).click()
+    
+    // EEX押下後の表示確認
+    await expect(page.locator('.stack-item.current-input .stack-value')).toHaveText('1.23e')
 
     // 指数入力: 4
     await page.getByRole('button', { name: '4' }).click()
+    
+    // 指数入力後の表示確認
+    await expect(page.locator('.stack-item.current-input .stack-value')).toHaveText('1.23e4')
 
     // 結果確認 (1.23e4 = 12300)
     await page.getByRole('button', { name: 'Enter' }).click()
     await expect(page.locator('.stack-item').nth(3).locator('.stack-value')).toHaveText('12300')
+  })
+
+  test('EEXボタンで1e4の入力と表示が正しく動作する', async ({ page }) => {
+    // 基数入力: 1
+    await page.getByRole('button', { name: '1' }).click()
+    
+    // 基数入力後の表示確認
+    await expect(page.locator('.stack-item.current-input .stack-value')).toHaveText('1')
+
+    // EEXボタンで指数モード
+    await page.getByRole('button', { name: 'EEX' }).click()
+    
+    // EEX押下後の表示確認
+    await expect(page.locator('.stack-item.current-input .stack-value')).toHaveText('1e')
+
+    // 指数入力: 4
+    await page.getByRole('button', { name: '4' }).click()
+    
+    // 指数入力後の表示確認
+    await expect(page.locator('.stack-item.current-input .stack-value')).toHaveText('1e4')
+
+    // 結果確認 (1e4 = 10000)
+    await page.getByRole('button', { name: 'Enter' }).click()
+    await expect(page.locator('.stack-item').nth(3).locator('.stack-value')).toHaveText('10000')
   })
 
   test('Deleteボタンで最後の桁を削除できる', async ({ page }) => {

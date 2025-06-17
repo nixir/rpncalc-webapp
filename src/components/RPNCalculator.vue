@@ -3,7 +3,7 @@
     <div class="calculator-display-area">
       <CalculatorDisplay
         :stack="store.stack"
-        :current-input="store.currentInput"
+        :current-input="store.currentDisplay"
         :input-mode="store.inputMode"
       />
     </div>
