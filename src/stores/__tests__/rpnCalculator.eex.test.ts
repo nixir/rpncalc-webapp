@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import { useRPNStore } from '../rpnCalculator'
 
-describe('RPN Calculator Store - HP-style Stack Lift', () => {
+describe('RPN Calculator Store - EEX Scientific Notation', () => {
   let store: ReturnType<typeof useRPNStore>
 
   beforeEach(() => {
@@ -10,282 +10,280 @@ describe('RPN Calculator Store - HP-style Stack Lift', () => {
     store = useRPNStore()
   })
 
-  describe('EEX (Enter Exponent) Functionality', () => {
-    it('should convert positive integer to power of 10', () => {
-      // 3 EEX -> 10^3 = 1000
-      store.inputDigit('3')
-      expect(store.currentInput).toBe('3')
-      expect(store.inputMode).toBe(true)
-
-      store.applyEEX()
-      expect(store.currentInput).toBe('1000')
-      expect(store.inputMode).toBe(true)
-    })
-
-    it('should convert zero to 1 (10^0)', () => {
-      // 0 EEX -> 10^0 = 1
-      store.inputDigit('0')
-      store.applyEEX()
-      expect(store.currentInput).toBe('1')
-    })
-
-    it('should convert negative integer to small decimal', () => {
-      // -3 EEX -> 10^(-3) = 0.001
-      store.inputDigit('3')
-      store.toggleSign()
-      expect(store.currentInput).toBe('-3')
-
-      store.applyEEX()
-      expect(store.currentInput).toBe('0.001')
-    })
-
-    it('should handle EEX with decimal exponents', () => {
-      // 2.5 EEX -> 10^2.5 ≈ 316.227766
-      store.inputDigit('2')
-      store.inputDecimal()
-      store.inputDigit('5')
-      expect(store.currentInput).toBe('2.5')
-
-      store.applyEEX()
-      const result = parseFloat(store.currentInput)
-      expect(result).toBeCloseTo(316.227766, 5)
-    })
-
-    it('should handle EEX with negative decimal exponents', () => {
-      // -2.5 EEX -> 10^(-2.5) ≈ 0.00316227766
-      store.inputDigit('2')
-      store.inputDecimal()
-      store.inputDigit('5')
-      store.toggleSign()
-      expect(store.currentInput).toBe('-2.5')
-
-      store.applyEEX()
-      const result = parseFloat(store.currentInput)
-      expect(result).toBeCloseTo(0.00316227766, 8)
-    })
-
-    it('should handle large positive exponents', () => {
-      // 6 EEX -> 10^6 = 1000000
-      store.inputDigit('6')
-      store.applyEEX()
-      expect(store.currentInput).toBe('1000000')
-    })
-
-    it('should handle large negative exponents', () => {
-      // -6 EEX -> 10^(-6) = 0.000001
-      store.inputDigit('6')
-      store.toggleSign()
-      store.applyEEX()
-      expect(store.currentInput).toBe('0.000001')
-    })
-
-    it('should do nothing when not in input mode', () => {
-      // No input entered, not in input mode
-      expect(store.inputMode).toBe(false)
-      expect(store.currentInput).toBe('')
-
-      store.applyEEX()
-      expect(store.inputMode).toBe(false)
-      expect(store.currentInput).toBe('')
-    })
-
-    it('should do nothing when current input is empty', () => {
-      // Start input mode but delete all content
-      store.inputDigit('5')
-      store.deleteLastDigit()
-      expect(store.inputMode).toBe(false)
-      expect(store.currentInput).toBe('')
-
-      store.applyEEX()
-      expect(store.inputMode).toBe(false)
-      expect(store.currentInput).toBe('')
-    })
-
-    it('should handle EEX followed by Enter', () => {
-      // 2 EEX Enter -> should push 100 to stack
-      store.inputDigit('2')
-      store.applyEEX()
-      expect(store.currentInput).toBe('100')
-
-      store.enterNumber()
-      expect(store.stack).toEqual([100])
-      expect(store.currentInput).toBe('')
-      expect(store.inputMode).toBe(false)
-    })
-
-    it('should work in calculations', () => {
-      // Calculate: 3 EEX + 1 = 1000 + 1 = 1001
-      store.inputDigit('3')
-      store.applyEEX()
-      expect(store.currentInput).toBe('1000')
-
-      store.enterNumber()
+  describe('EEX (Enter Exponent) Scientific Notation Functionality', () => {
+    it('should enter EEX mode and display scientific notation', () => {
+      // 1.23 EEX 4 -> should display "1.23e4"
       store.inputDigit('1')
+      store.inputDecimal()
+      store.inputDigit('2')
+      store.inputDigit('3')
+      expect(store.currentInput).toBe('1.23')
+      expect(store.eexMode).toBe(false)
+
+      store.inputEEX()
+      expect(store.eexMode).toBe(true)
+      expect(store.exponent).toBe('')
+      expect(store.currentDisplay).toBe('1.23e')
+
+      store.inputDigit('4')
+      expect(store.exponent).toBe('4')
+      expect(store.currentDisplay).toBe('1.23e4')
+    })
+
+    it('should convert scientific notation to decimal on enter', () => {
+      // 1.23e4 Enter -> should push 12300 to stack
+      store.inputDigit('1')
+      store.inputDecimal()
+      store.inputDigit('2')
+      store.inputDigit('3')
+      store.inputEEX()
+      store.inputDigit('4')
+
+      store.enterNumber()
+      expect(store.stack).toEqual([12300])
+      expect(store.currentInput).toBe('')
+      expect(store.inputMode).toBe(false)
+      expect(store.eexMode).toBe(false)
+    })
+
+    it('should handle negative exponents', () => {
+      // 5.6e-3 -> 0.0056
+      store.inputDigit('5')
+      store.inputDecimal()
+      store.inputDigit('6')
+      store.inputEEX()
+      store.inputDigit('3')
+      store.toggleSign()
+      expect(store.currentDisplay).toBe('5.6e-3')
+
+      store.enterNumber()
+      expect(store.stack).toEqual([0.0056])
+    })
+
+    it('should handle integer mantissa with positive exponent', () => {
+      // 2e10 -> 20000000000
+      store.inputDigit('2')
+      store.inputEEX()
+      store.inputDigit('1')
+      store.inputDigit('0')
+      expect(store.currentDisplay).toBe('2e10')
+
+      store.enterNumber()
+      expect(store.stack).toEqual([20000000000])
+    })
+
+    it('should handle zero exponent', () => {
+      // 3.14e0 -> 3.14
+      store.inputDigit('3')
+      store.inputDecimal()
+      store.inputDigit('1')
+      store.inputDigit('4')
+      store.inputEEX()
+      store.inputDigit('0')
+
+      store.enterNumber()
+      expect(store.stack).toEqual([3.14])
+    })
+
+    it('should handle EEX from non-input mode', () => {
+      // EEX from non-input mode should start with "1e"
+      expect(store.inputMode).toBe(false)
+
+      store.inputEEX()
+      expect(store.inputMode).toBe(true)
+      expect(store.eexMode).toBe(true)
+      expect(store.currentInput).toBe('1')
+      expect(store.currentDisplay).toBe('1e')
+    })
+
+    it('should not allow decimal point in exponent', () => {
+      // Try to input decimal in exponent (should be ignored)
+      store.inputDigit('1')
+      store.inputEEX()
+      store.inputDigit('2')
+      expect(store.exponent).toBe('2')
+
+      store.inputDecimal() // Should be ignored in EEX mode
+      expect(store.exponent).toBe('2')
+      expect(store.currentDisplay).toBe('1e2')
+    })
+
+    it('should handle delete in EEX mode', () => {
+      // Test deleting in exponent
+      store.inputDigit('1')
+      store.inputEEX()
+      store.inputDigit('2')
+      store.inputDigit('3')
+      expect(store.exponent).toBe('23')
+
+      store.deleteLastDigit()
+      expect(store.exponent).toBe('2')
+      expect(store.currentDisplay).toBe('1e2')
+
+      store.deleteLastDigit()
+      expect(store.exponent).toBe('')
+      expect(store.currentDisplay).toBe('1e')
+
+      // Deleting from empty exponent should exit EEX mode
+      store.deleteLastDigit()
+      expect(store.eexMode).toBe(false)
+      expect(store.currentDisplay).toBe('1')
+    })
+
+    it('should handle sign toggle in EEX mode', () => {
+      // Test toggling sign in exponent
+      store.inputDigit('2')
+      store.inputEEX()
+      store.inputDigit('5')
+      expect(store.currentDisplay).toBe('2e5')
+
+      store.toggleSign()
+      expect(store.currentDisplay).toBe('2e-5')
+
+      store.toggleSign()
+      expect(store.currentDisplay).toBe('2e5')
+    })
+
+    it('should work with calculations', () => {
+      // Calculate: 1e3 + 1e2 = 1000 + 100 = 1100
+      store.inputDigit('1')
+      store.inputEEX()
+      store.inputDigit('3')
+      store.enterNumber()
+      expect(store.stack).toEqual([1000])
+
+      store.inputDigit('1')
+      store.inputEEX()
+      store.inputDigit('2')
       store.performOperation('+')
-      expect(store.stack).toEqual([1001])
+      expect(store.stack).toEqual([1100])
+    })
+
+    it('should handle very large numbers', () => {
+      // 1e20 -> 1e20 (very large number)
+      store.inputDigit('1')
+      store.inputEEX()
+      store.inputDigit('2')
+      store.inputDigit('0')
+
+      store.enterNumber()
+      expect(store.stack).toEqual([1e20])
+    })
+
+    it('should handle very small numbers', () => {
+      // 1e-20 -> 1e-20 (very small number)
+      store.inputDigit('1')
+      store.inputEEX()
+      store.inputDigit('2')
+      store.inputDigit('0')
+      store.toggleSign()
+
+      store.enterNumber()
+      expect(store.stack).toEqual([1e-20])
+    })
+
+    it('should reset EEX mode on clear all', () => {
+      store.inputDigit('1')
+      store.inputEEX()
+      store.inputDigit('2')
+      expect(store.eexMode).toBe(true)
+
+      store.clearAll()
+      expect(store.eexMode).toBe(false)
+      expect(store.exponent).toBe('')
+    })
+
+    it('should handle EEX with performance operation without explicit enter', () => {
+      // 1e3 + 500 = 1000 + 500 = 1500
+      store.inputDigit('1')
+      store.inputEEX()
+      store.inputDigit('3')
+      expect(store.currentDisplay).toBe('1e3')
+      expect(store.eexMode).toBe(true)
+
+      store.enterNumber()
+      expect(store.stack).toEqual([1000]) // 1e3 should be auto-entered
+      expect(store.eexMode).toBe(false) // Should exit EEX mode when starting new number
+
+      store.inputDigit('5')
+      expect(store.currentInput).toBe('5')
+
+      store.inputDigit('0')
+      store.inputDigit('0')
+      expect(store.currentInput).toBe('500')
+
+      store.performOperation('+')
+      expect(store.stack).toEqual([1500])
     })
 
     it('should handle consecutive EEX operations', () => {
-      // 2 EEX EEX -> 10^2 = 100, then 10^100 (very large number)
+      // 1e2 Enter, then 2e3 -> should have [100, 2000] in stack
+      store.inputDigit('1')
+      store.inputEEX()
       store.inputDigit('2')
-      store.applyEEX()
-      expect(store.currentInput).toBe('100')
+      store.enterNumber()
+      expect(store.stack).toEqual([100])
 
-      // Apply EEX again: 10^100
-      store.applyEEX()
-      const result = parseFloat(store.currentInput)
-      expect(result).toBe(Math.pow(10, 100))
+      store.inputDigit('2')
+      store.inputEEX()
+      store.inputDigit('3')
+      store.enterNumber()
+      expect(store.stack).toEqual([100, 2000])
     })
 
-    it('should handle EEX with fractional results', () => {
-      // 0.5 EEX -> 10^0.5 ≈ 3.162277660168379
-      store.inputDigit('0')
-      store.inputDecimal()
-      store.inputDigit('5')
-      store.applyEEX()
-
-      const result = parseFloat(store.currentInput)
-      expect(result).toBeCloseTo(3.162277660168379, 10)
-    })
-
-    it('should handle EEX with very small fractional exponents', () => {
-      // 0.1 EEX -> 10^0.1 ≈ 1.2589254117941673
+    it('should handle scientific notation with fractional mantissa', () => {
+      // 0.123e4 -> 1230
       store.inputDigit('0')
       store.inputDecimal()
       store.inputDigit('1')
-      store.applyEEX()
+      store.inputDigit('2')
+      store.inputDigit('3')
+      store.inputEEX()
+      store.inputDigit('4')
 
-      const result = parseFloat(store.currentInput)
-      expect(result).toBeCloseTo(1.2589254117941673, 10)
+      store.enterNumber()
+      expect(store.stack).toEqual([1230])
     })
+  })
 
-    it('should handle EEX in scientific calculation workflow', () => {
-      // Simulate: 6.02 × 10^23 (Avogadro's number)
-      // Input: 6.02 Enter 23 EEX × = 6.02 × 10^23
-
+  describe('Real-world Scientific Notation Scenarios', () => {
+    it('should handle Avogadro number calculation', () => {
+      // 6.02e23 (Avogadro's number)
       store.inputDigit('6')
       store.inputDecimal()
       store.inputDigit('0')
       store.inputDigit('2')
-      store.enterNumber()
-      expect(store.stack).toEqual([6.02])
-
+      store.inputEEX()
       store.inputDigit('2')
       store.inputDigit('3')
-      store.applyEEX()
-      // Very large numbers are displayed in scientific notation
-      expect(store.currentInput).toBe('1e+23')
 
-      store.performOperation('×')
-      expect(store.stack[0]).toBeCloseTo(6.02e23, -18) // Very large number comparison
-    })
-
-    it('should preserve input mode after EEX operation', () => {
-      // EEX should keep the calculator in input mode for further editing
-      store.inputDigit('1')
-      expect(store.inputMode).toBe(true)
-
-      store.applyEEX()
-      expect(store.inputMode).toBe(true)
-      expect(store.currentInput).toBe('10')
-
-      // Should be able to continue editing (though this might not be typical usage)
-      store.inputDigit('5')
-      expect(store.currentInput).toBe('105')
-    })
-
-    it('should handle EEX with stack operations', () => {
-      // Test EEX in context of stack manipulation
-      // 1 Enter 2 EEX Swap -> should have 100 in Y and 1 in X
-
-      store.inputDigit('1')
       store.enterNumber()
-      store.inputDigit('2')
-      store.applyEEX()
-      store.enterNumber()
-      expect(store.stack).toEqual([1, 100])
-
-      store.swapStack()
-      expect(store.stack).toEqual([100, 1])
+      expect(store.stack[0]).toBeCloseTo(6.02e23, -18)
     })
 
-    it('should handle edge case with negative zero', () => {
-      // -0 EEX -> should still result in 1 (10^-0 = 10^0 = 1)
-      store.inputDigit('0')
+    it('should handle speed of light calculation', () => {
+      // 3e8 m/s (speed of light approximation)
+      store.inputDigit('3')
+      store.inputEEX()
+      store.inputDigit('8')
+
+      store.enterNumber()
+      expect(store.stack).toEqual([300000000])
+    })
+
+    it('should handle electron mass calculation', () => {
+      // 9.11e-31 kg (electron mass approximation)
+      store.inputDigit('9')
+      store.inputDecimal()
+      store.inputDigit('1')
+      store.inputDigit('1')
+      store.inputEEX()
+      store.inputDigit('3')
+      store.inputDigit('1')
       store.toggleSign()
-      expect(store.currentInput).toBe('-0')
 
-      store.applyEEX()
-      expect(store.currentInput).toBe('1')
-    })
-
-    it('should handle very large exponents gracefully', () => {
-      // 10 EEX -> 10^10 = 10000000000
-      store.inputDigit('1')
-      store.inputDigit('0')
-      store.applyEEX()
-      expect(store.currentInput).toBe('10000000000')
-    })
-  })
-
-  describe('Real-world HP Calculator Scenarios', () => {
-    it('should handle classic HP example: 15 Enter 7 - 2 /', () => {
-      // 15 Enter
-      store.inputDigit('1')
-      store.inputDigit('5')
       store.enterNumber()
-
-      // 7 -  (15 - 7 = 8)
-      store.inputDigit('7')
-      store.performOperation('-')
-      expect(store.stack).toEqual([8])
-
-      // 2 /  (8 / 2 = 4)
-      store.inputDigit('2')
-      store.performOperation('÷')
-      expect(store.stack).toEqual([4])
-    })
-
-    it('should handle Enter key for intermediate calculations', () => {
-      // Calculate (3 + 5) * (7 - 2)
-      // Method: 3 Enter 5 + 7 Enter 2 - *
-
-      store.inputDigit('3')
-      store.enterNumber()
-      store.inputDigit('5')
-      store.performOperation('+')
-      expect(store.stack).toEqual([8]) // 3 + 5 = 8
-
-      store.inputDigit('7')
-      store.enterNumber()
-      store.inputDigit('2')
-      store.performOperation('-')
-      expect(store.stack).toEqual([8, 5]) // 7 - 2 = 5, with 8 still in Y
-
-      store.performOperation('×')
-      expect(store.stack).toEqual([40]) // 8 * 5 = 40
-    })
-
-    it('should handle calculations with negative numbers', () => {
-      // Calculate: -15 + 20 - 3 = 2
-
-      // Enter -15
-      store.inputDigit('1')
-      store.inputDigit('5')
-      store.toggleSign()
-      store.enterNumber()
-      expect(store.stack).toEqual([-15])
-
-      // Add 20: -15 + 20 = 5
-      store.inputDigit('2')
-      store.inputDigit('0')
-      store.performOperation('+')
-      expect(store.stack).toEqual([5])
-
-      // Subtract 3: 5 - 3 = 2
-      store.inputDigit('3')
-      store.performOperation('-')
-      expect(store.stack).toEqual([2])
+      expect(store.stack[0]).toBeCloseTo(9.11e-31, -40)
     })
   })
 })

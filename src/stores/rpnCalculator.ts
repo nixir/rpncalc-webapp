@@ -9,6 +9,9 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
   const inputMode = ref<boolean>(false)
   const history = ref<HistoryItem[]>([])
   const lastOperationWasEnter = ref<boolean>(false)
+  const eexMode = ref<boolean>(false)
+  const exponent = ref<string>('')
+  const eexJustEntered = ref<boolean>(false)
 
   // Helper function for HP-style stack lift
   const liftStack = () => {
@@ -16,6 +19,24 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
     if (stack.value.length >= 4) {
       stack.value = stack.value.slice(1) // Remove T (oldest value)
     }
+  }
+
+  // Helper function to convert scientific notation to number
+  const parseScientificNotation = (): number | null => {
+    if (!eexMode.value) {
+      // 通常モード：そのままparseFloat
+      return parseFloat(currentInput.value)
+    }
+    
+    // EEXモード：mantissa × 10^exponent として計算
+    const mantissa = parseFloat(currentInput.value)
+    const exp = parseFloat(exponent.value) || 0
+    
+    if (isNaN(mantissa)) {
+      return null
+    }
+    
+    return mantissa * Math.pow(10, exp)
   }
 
   // Computed
@@ -31,6 +52,10 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
 
   const currentDisplay = computed(() => {
     if (inputMode.value && currentInput.value) {
+      if (eexMode.value) {
+        // 科学記数法表示: mantissa + 'e' + exponent
+        return currentInput.value + 'e' + exponent.value
+      }
       return currentInput.value
     }
     return stack.value.length > 0 ? stack.value[stack.value.length - 1].toString() : '0'
@@ -53,17 +78,49 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
 
   // Actions
   const inputDigit = (digit: string) => {
-    lastOperationWasEnter.value = false
-    if (!inputMode.value) {
+    if (eexMode.value) {
+      if (eexJustEntered.value) {
+        // EEXが実行された直後：指数部分に数字を追加
+        exponent.value += digit
+        eexJustEntered.value = false
+        lastOperationWasEnter.value = false
+      } else {
+        // 指数部分に数字を追加
+        exponent.value += digit
+        lastOperationWasEnter.value = false
+      }
+    } else if (!inputMode.value) {
+      // 通常モード：新しい数値入力開始
+      // EEXモードをリセット（前の計算の名残をクリア）
+      if (eexMode.value) {
+        // 前のEEX値を自動enter してから新しい数値入力を開始
+        enterNumber()
+      }
       currentInput.value = digit
       inputMode.value = true
+      lastOperationWasEnter.value = false
     } else {
-      currentInput.value += digit
+      // 通常モード：仮数部分に数字を追加
+      // 但し、EEXモードから通常モードに移行する場合は自動enter
+      if (eexMode.value) {
+        // 前のEEX値を自動enter してから新しい数値入力を開始
+        enterNumber()
+        currentInput.value = digit
+        inputMode.value = true
+        lastOperationWasEnter.value = false
+      } else {
+        currentInput.value += digit
+        lastOperationWasEnter.value = false
+      }
     }
   }
 
   const inputDecimal = () => {
     lastOperationWasEnter.value = false
+    if (eexMode.value) {
+      // EEXモード：指数部分には小数点は入力できない
+      return
+    }
     if (!inputMode.value) {
       currentInput.value = '0.'
       inputMode.value = true
@@ -75,13 +132,16 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
   const enterNumber = () => {
     if (inputMode.value && currentInput.value !== '') {
       // New number input: perform stack lift and push new number
-      const number = parseFloat(currentInput.value)
-      if (!isNaN(number)) {
+      const number = parseScientificNotation()
+      if (number !== null && !isNaN(number)) {
         saveToHistory('stack_operation', 'enter')
         liftStack()
         stack.value.push(number)
         currentInput.value = ''
         inputMode.value = false
+        eexMode.value = false
+        exponent.value = ''
+        eexJustEntered.value = false
         lastOperationWasEnter.value = true
       }
     } else if (!inputMode.value && stack.value.length > 0) {
@@ -131,7 +191,15 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
   }
 
   const toggleSign = () => {
-    if (inputMode.value && currentInput.value) {
+    if (eexMode.value) {
+      // EEXモード：指数部分の符号を切り替え
+      if (exponent.value.startsWith('-')) {
+        exponent.value = exponent.value.slice(1)
+      } else {
+        exponent.value = '-' + exponent.value
+      }
+    } else if (inputMode.value && currentInput.value) {
+      // 通常モード：仮数部分の符号を切り替え
       if (currentInput.value.startsWith('-')) {
         currentInput.value = currentInput.value.slice(1)
       } else {
@@ -140,13 +208,22 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
     }
   }
 
-  const applyEEX = () => {
+  const inputEEX = () => {
+    // EEXキーを押すとeexModeに移行し、指数入力を開始
     if (inputMode.value && currentInput.value) {
-      const base = parseFloat(currentInput.value)
-      if (!isNaN(base)) {
-        const result = Math.pow(10, base)
-        currentInput.value = result.toString()
-      }
+      // 仮数部が入力されている場合のみEEXモードに移行
+      eexMode.value = true
+      exponent.value = ''
+      eexJustEntered.value = true
+      lastOperationWasEnter.value = false
+    } else if (!inputMode.value) {
+      // 入力モードでない場合は、1eから開始
+      currentInput.value = '1'
+      inputMode.value = true
+      eexMode.value = true
+      exponent.value = ''
+      eexJustEntered.value = true
+      lastOperationWasEnter.value = false
     }
   }
 
@@ -169,7 +246,16 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
   }
 
   const deleteLastDigit = () => {
-    if (inputMode.value && currentInput.value.length > 0) {
+    if (eexMode.value) {
+      // EEXモード：指数部分から削除
+      if (exponent.value.length > 0) {
+        exponent.value = exponent.value.slice(0, -1)
+      } else {
+        // 指数部分が空の場合、EEXモードを終了
+        eexMode.value = false
+      }
+    } else if (inputMode.value && currentInput.value.length > 0) {
+      // 通常モード：仮数部分から削除
       currentInput.value = currentInput.value.slice(0, -1)
       if (currentInput.value === '') {
         inputMode.value = false
@@ -193,6 +279,9 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
     inputMode.value = false
     history.value = []
     lastOperationWasEnter.value = false
+    eexMode.value = false
+    exponent.value = ''
+    eexJustEntered.value = false
   }
 
   return {
@@ -202,6 +291,9 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
     inputMode,
     history,
     lastOperationWasEnter,
+    eexMode,
+    exponent,
+    eexJustEntered,
     
     // Computed
     displayStack,
@@ -213,7 +305,7 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
     enterNumber,
     performOperation,
     toggleSign,
-    applyEEX,
+    inputEEX,
     dropStack,
     swapStack,
     deleteLastDigit,

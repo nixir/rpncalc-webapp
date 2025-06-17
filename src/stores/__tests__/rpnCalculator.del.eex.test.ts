@@ -231,16 +231,23 @@ describe('RPN Calculator Store - HP-style Stack Lift', () => {
       expect(store.inputMode).toBe(false)
     })
 
-    it('should handle deletion after EEX operation', () => {
-      // 3 EEX DEL -> should delete from '1000'
+    it('should handle deletion in EEX mode', () => {
+      // 3 EEX 4 DEL -> should delete from exponent '4' to ''
       store.inputDigit('3')
-      store.applyEEX()
-      expect(store.currentInput).toBe('1000')
-      expect(store.inputMode).toBe(true)
+      store.inputEEX()
+      store.inputDigit('4')
+      expect(store.currentDisplay).toBe('3e4')
+      expect(store.eexMode).toBe(true)
 
       store.deleteLastDigit()
-      expect(store.currentInput).toBe('100')
-      expect(store.inputMode).toBe(true)
+      expect(store.exponent).toBe('')
+      expect(store.currentDisplay).toBe('3e')
+      expect(store.eexMode).toBe(true)
+
+      // Delete again should exit EEX mode
+      store.deleteLastDigit()
+      expect(store.eexMode).toBe(false)
+      expect(store.currentDisplay).toBe('3')
     })
 
     it('should handle deletion from very small decimal', () => {

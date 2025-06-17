@@ -270,20 +270,23 @@ describe('RPN Calculator Store - HP-style Stack Lift', () => {
       expect(store.lastOperationWasEnter).toBe(false)
     })
 
-    it('should undo after EEX operation', () => {
-      // Apply EEX: 3 EEX Enter (1000)
+    it('should undo after EEX scientific notation operation', () => {
+      // Apply EEX: 3 EEX 2 Enter (300)
       store.inputDigit('3')
-      store.applyEEX()
-      expect(store.currentInput).toBe('1000')
+      store.inputEEX()
+      store.inputDigit('2')
+      expect(store.currentDisplay).toBe('3e2')
 
       store.enterNumber()
-      expect(store.stack).toEqual([1000])
+      expect(store.stack).toEqual([300])
+      expect(store.eexMode).toBe(false)
 
       // Undo enter
       store.undoLastOperation()
       expect(store.stack).toEqual([])
-      expect(store.currentInput).toBe('1000')
+      expect(store.currentInput).toBe('3')
       expect(store.inputMode).toBe(true)
+      expect(store.eexMode).toBe(false)
     })
 
     it('should handle undo with input during operation', () => {

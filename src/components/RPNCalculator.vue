@@ -62,7 +62,7 @@ const handleButtonPress = (value: string) => {
       break
     
     case 'eex':
-      store.applyEEX()
+      store.inputEEX()
       break
     
     case 'drop':
