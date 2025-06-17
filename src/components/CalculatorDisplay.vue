@@ -81,7 +81,7 @@ const formatNumber = (value: number): string => {
   flex-direction: column;
   justify-content: flex-end;
   height: 100%;
-  background-color: #000;
+  background-color: var(--sol-base2);
   padding: 20px;
   font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
   overflow: hidden;
@@ -90,7 +90,7 @@ const formatNumber = (value: number): string => {
 .stack-item {
   display: flex;
   align-items: center;
-  color: #fff;
+  color: var(--sol-base01);
   min-height: 2.5rem;
   padding: 0.25rem 0;
   gap: 1rem;
@@ -100,7 +100,7 @@ const formatNumber = (value: number): string => {
   flex: 0 0 auto;
   font-size: 1rem;
   font-weight: 500;
-  color: #888;
+  color: var(--sol-base1);
   width: 1.5rem;
   text-align: left;
 }
@@ -117,7 +117,7 @@ const formatNumber = (value: number): string => {
 }
 
 .stack-item.current-input .stack-value {
-  color: #fff;
+  color: var(--sol-base00);
   font-weight: 400;
 }
 

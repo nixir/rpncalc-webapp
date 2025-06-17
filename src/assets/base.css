@@ -1,24 +1,45 @@
-/* color palette from <https://github.com/vuejs/theme> */
+/* Solarized Light color palette */
 :root {
-  --vt-c-white: #ffffff;
-  --vt-c-white-soft: #f8f8f8;
-  --vt-c-white-mute: #f2f2f2;
+  /* Solarized base colors */
+  --sol-base03: #002b36;
+  --sol-base02: #073642;
+  --sol-base01: #586e75;
+  --sol-base00: #657b83;
+  --sol-base0: #839496;
+  --sol-base1: #93a1a1;
+  --sol-base2: #eee8d5;
+  --sol-base3: #fdf6e3;
+  
+  /* Solarized accent colors */
+  --sol-yellow: #b58900;
+  --sol-orange: #cb4b16;
+  --sol-red: #dc322f;
+  --sol-magenta: #d33682;
+  --sol-violet: #6c71c4;
+  --sol-blue: #268bd2;
+  --sol-cyan: #2aa198;
+  --sol-green: #859900;
 
-  --vt-c-black: #181818;
-  --vt-c-black-soft: #222222;
-  --vt-c-black-mute: #282828;
+  /* Legacy Vue theme compatibility */
+  --vt-c-white: var(--sol-base3);
+  --vt-c-white-soft: var(--sol-base2);
+  --vt-c-white-mute: #f5f0e1;
 
-  --vt-c-indigo: #2c3e50;
+  --vt-c-black: var(--sol-base03);
+  --vt-c-black-soft: var(--sol-base02);
+  --vt-c-black-mute: var(--sol-base01);
 
-  --vt-c-divider-light-1: rgba(60, 60, 60, 0.29);
-  --vt-c-divider-light-2: rgba(60, 60, 60, 0.12);
-  --vt-c-divider-dark-1: rgba(84, 84, 84, 0.65);
-  --vt-c-divider-dark-2: rgba(84, 84, 84, 0.48);
+  --vt-c-indigo: var(--sol-base01);
 
-  --vt-c-text-light-1: var(--vt-c-indigo);
-  --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
-  --vt-c-text-dark-1: var(--vt-c-white);
-  --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
+  --vt-c-divider-light-1: rgba(88, 110, 117, 0.29);
+  --vt-c-divider-light-2: rgba(88, 110, 117, 0.12);
+  --vt-c-divider-dark-1: rgba(147, 161, 161, 0.65);
+  --vt-c-divider-dark-2: rgba(147, 161, 161, 0.48);
+
+  --vt-c-text-light-1: var(--sol-base01);
+  --vt-c-text-light-2: var(--sol-base00);
+  --vt-c-text-dark-1: var(--sol-base2);
+  --vt-c-text-dark-2: var(--sol-base1);
 }
 
 /* semantic color variables for this project */

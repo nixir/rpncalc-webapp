@@ -173,7 +173,7 @@ const handleButtonClick = (value: string) => {
 .calculator-keyboard {
   height: 100%;
   padding: 8px 4px;
-  background-color: #000;
+  background-color: var(--sol-base3);
   display: flex;
   flex-direction: column;
   gap: 8px;

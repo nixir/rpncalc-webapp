@@ -61,7 +61,7 @@ const onTouchEnd = () => {
   border-radius: 8px;
   font-size: 1.5rem;
   font-weight: 500;
-  color: white;
+  color: var(--sol-base3);
   cursor: pointer;
   user-select: none;
   transition: all 0.1s ease;
@@ -79,45 +79,46 @@ const onTouchEnd = () => {
 
 /* Button type styles */
 .button-number {
-  background-color: #505050;
+  background-color: var(--sol-base1);
+  color: var(--sol-base3);
 }
 
 .button-number:hover {
-  background-color: #606060;
+  background-color: var(--sol-base0);
 }
 
 .button-operator {
-  background-color: #ff9500;
+  background-color: var(--sol-orange);
 }
 
 .button-operator:hover {
-  background-color: #ffad33;
+  background-color: var(--sol-red);
 }
 
 .button-function {
-  background-color: #a6a6a6;
-  color: #000;
+  background-color: var(--sol-blue);
+  color: var(--sol-base3);
 }
 
 .button-function:hover {
-  background-color: #b6b6b6;
+  background-color: var(--sol-cyan);
 }
 
 .button-enter {
-  background-color: #ff9500;
+  background-color: var(--sol-green);
 }
 
 .button-enter:hover {
-  background-color: #ffad33;
+  background-color: var(--sol-yellow);
 }
 
 .button-clear {
-  background-color: #a6a6a6;
-  color: #000;
+  background-color: var(--sol-base1);
+  color: var(--sol-base01);
 }
 
 .button-clear:hover {
-  background-color: #b6b6b6;
+  background-color: var(--sol-base0);
 }
 
 .button-disabled {

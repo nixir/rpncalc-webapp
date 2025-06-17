@@ -175,7 +175,7 @@ onUnmounted(() => {
   /* iOS Safari specific fallback */
   height: -webkit-fill-available;
   width: 100vw;
-  background-color: #000;
+  background-color: var(--sol-base3);
   overflow: hidden;
   
   /* iPhone safe area support - only top and bottom */
@@ -186,12 +186,12 @@ onUnmounted(() => {
 .calculator-display-area {
   flex: 0 0 40%;
   min-height: 200px;
-  background-color: #000;
+  background-color: var(--sol-base2);
 }
 
 .calculator-keyboard-area {
   flex: 1;
-  background-color: #000;
+  background-color: var(--sol-base3);
   min-height: 300px;
 }
 
