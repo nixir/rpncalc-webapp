@@ -210,8 +210,21 @@ const handleButtonClick = (value: string) => {
   
   .keyboard-row {
     gap: 6px;
-    min-height: 50px;
+    min-height: 48px;
     height: calc((100% - 24px) / 5);
+  }
+}
+
+@media (max-height: 650px) {
+  .calculator-keyboard {
+    padding: 5px 3px;
+    gap: 5px;
+  }
+  
+  .keyboard-row {
+    gap: 5px;
+    min-height: 44px;
+    height: calc((100% - 20px) / 5);
   }
 }
 
@@ -223,7 +236,50 @@ const handleButtonClick = (value: string) => {
   
   .keyboard-row {
     gap: 4px;
-    min-height: 45px;
+    min-height: 42px;
+    height: calc((100% - 16px) / 5);
+  }
+}
+
+/* iPhone specific keyboard adjustments */
+@media (max-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+  /* iPhone 12, 13, 14, X, XS */
+  .calculator-keyboard {
+    padding: 6px 4px;
+    gap: 6px;
+  }
+  
+  .keyboard-row {
+    gap: 6px;
+    min-height: 50px;
+    height: calc((100% - 24px) / 5);
+  }
+}
+
+@media (max-height: 736px) and (-webkit-device-pixel-ratio: 3) {
+  /* iPhone 6+, 7+, 8+ */
+  .calculator-keyboard {
+    padding: 5px 3px;
+    gap: 5px;
+  }
+  
+  .keyboard-row {
+    gap: 5px;
+    min-height: 46px;
+    height: calc((100% - 20px) / 5);
+  }
+}
+
+@media (max-height: 667px) and (-webkit-device-pixel-ratio: 2) {
+  /* iPhone 6, 7, 8, SE 2nd/3rd gen */
+  .calculator-keyboard {
+    padding: 4px 2px;
+    gap: 4px;
+  }
+  
+  .keyboard-row {
+    gap: 4px;
+    min-height: 44px;
     height: calc((100% - 16px) / 5);
   }
 }

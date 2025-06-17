@@ -168,7 +168,12 @@ onUnmounted(() => {
 .rpn-calculator {
   display: flex;
   flex-direction: column;
+  /* Use dynamic viewport height for better Safari support */
+  height: 100dvh;
+  /* Fallback for browsers that don't support dvh */
   height: 100vh;
+  /* iOS Safari specific fallback */
+  height: -webkit-fill-available;
   width: 100vw;
   background-color: #000;
   overflow: hidden;
@@ -190,25 +195,66 @@ onUnmounted(() => {
   min-height: 300px;
 }
 
+/* iOS Safari specific adjustments */
+@supports (-webkit-touch-callout: none) {
+  .rpn-calculator {
+    /* Additional iOS Safari viewport fix */
+    min-height: -webkit-fill-available;
+  }
+}
+
 /* Responsive adjustments for smaller screens */
 @media (max-height: 700px) {
   .calculator-display-area {
-    flex: 0 0 35%;
-    min-height: 180px;
+    flex: 0 0 32%;
+    min-height: 160px;
+  }
+}
+
+@media (max-height: 650px) {
+  .calculator-display-area {
+    flex: 0 0 28%;
+    min-height: 140px;
   }
 }
 
 @media (max-height: 600px) {
   .calculator-display-area {
+    flex: 0 0 25%;
+    min-height: 120px;
+  }
+}
+
+/* iPhone specific adjustments (common iPhone screen heights) */
+@media (max-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+  /* iPhone 12, 13, 14, X, XS */
+  .calculator-display-area {
     flex: 0 0 30%;
-    min-height: 160px;
+    min-height: 150px;
+  }
+}
+
+@media (max-height: 736px) and (-webkit-device-pixel-ratio: 3) {
+  /* iPhone 6+, 7+, 8+ */
+  .calculator-display-area {
+    flex: 0 0 28%;
+    min-height: 140px;
+  }
+}
+
+@media (max-height: 667px) and (-webkit-device-pixel-ratio: 2) {
+  /* iPhone 6, 7, 8, SE 2nd/3rd gen */
+  .calculator-display-area {
+    flex: 0 0 25%;
+    min-height: 120px;
   }
 }
 
 /* Landscape orientation adjustments */
 @media (orientation: landscape) {
   .calculator-display-area {
-    flex: 0 0 30%;
+    flex: 0 0 25%;
+    min-height: 100px;
   }
 }
 </style>
