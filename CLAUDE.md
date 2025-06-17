@@ -17,6 +17,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is a Vue 3 + TypeScript web application for an RPN (Reverse Polish Notation) calculator.
 
 **Tech Stack:**
+
 - Vue 3 with Composition API
 - TypeScript
 - Vite (build tool)
@@ -26,6 +27,7 @@ This is a Vue 3 + TypeScript web application for an RPN (Reverse Polish Notation
 - ESLint + Prettier (code quality)
 
 **Project Structure:**
+
 - `src/components/` - Vue components
 - `src/stores/` - Pinia stores for state management
 - `src/assets/` - Static assets (CSS, images)
@@ -33,10 +35,24 @@ This is a Vue 3 + TypeScript web application for an RPN (Reverse Polish Notation
 - `src/components/__tests__/` - Unit tests
 
 **Key Conventions:**
+
 - Uses `@` alias for `src/` directory
 - Vue SFC (Single File Components) with `<script setup>` syntax
 - Composition API with Pinia stores
 - TypeScript strict mode enabled
 
 **Deployment Configuration:**
+
 - Vite base path is set to `/rpncalc-webapp/` for GitHub Pages deployment
+
+**Output:**
+
+- 出力は全て日本語
+
+**ソースコードの探し方**
+
+- 積極的にrgコマンドを利用する
+
+**アプリの仕様**
+
+- RPN電卓のWebアプリ
