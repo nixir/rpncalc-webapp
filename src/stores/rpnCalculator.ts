@@ -27,15 +27,15 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
       // 通常モード：そのままparseFloat
       return parseFloat(currentInput.value)
     }
-    
+
     // EEXモード：mantissa × 10^exponent として計算
     const mantissa = parseFloat(currentInput.value)
     const exp = parseFloat(exponent.value) || 0
-    
+
     if (isNaN(mantissa)) {
       return null
     }
-    
+
     return mantissa * Math.pow(10, exp)
   }
 
@@ -45,7 +45,7 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
     if (inputMode.value && currentInput.value) {
       result.push(parseFloat(currentInput.value) || 0)
     }
-    
+
     // Ensure we show up to 4 items, with newest at bottom
     return result.slice(-4)
   })
@@ -67,9 +67,9 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
       type,
       previousStack: [...stack.value],
       previousInput: currentInput.value,
-      operation
+      operation,
     })
-    
+
     // Keep only last 50 history items
     if (history.value.length > 50) {
       history.value.shift()
@@ -109,7 +109,12 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
         inputMode.value = true
         lastOperationWasEnter.value = false
       } else {
-        currentInput.value += digit
+        // 現在の入力が"0"の場合は新しい値で上書きする。
+        if (currentInput.value === '0') {
+          currentInput.value = digit
+        } else {
+          currentInput.value += digit
+        }
         lastOperationWasEnter.value = false
       }
     }
@@ -294,11 +299,11 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
     eexMode,
     exponent,
     eexJustEntered,
-    
+
     // Computed
     displayStack,
     currentDisplay,
-    
+
     // Actions
     inputDigit,
     inputDecimal,
@@ -310,6 +315,6 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
     swapStack,
     deleteLastDigit,
     undoLastOperation,
-    clearAll
+    clearAll,
   }
 })

@@ -305,10 +305,10 @@ describe('RPN Calculator Store - HP-style Stack Lift', () => {
       store.inputDigit('1')
       store.inputDigit('2')
       store.inputDigit('3')
-      expect(store.currentInput).toBe('000123')
+      expect(store.currentInput).toBe('123')
 
       store.deleteLastDigit()
-      expect(store.currentInput).toBe('00012')
+      expect(store.currentInput).toBe('12')
       expect(store.inputMode).toBe(true)
     })
   })
