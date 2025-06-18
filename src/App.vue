@@ -8,23 +8,24 @@ import RPNCalculator from './components/RPNCalculator.vue'
 
 <style>
 /* Global styles for RPN Calculator */
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   height: 100%;
   width: 100%;
   overflow: hidden;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell',
+    'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #000;
   color: #fff;
-  
+
   /* Prevent zoom on iOS */
   -webkit-text-size-adjust: 100%;
-  
+
   /* Prevent pull-to-refresh */
   overscroll-behavior: none;
 }
@@ -67,7 +68,9 @@ button {
 }
 
 /* Prevent zoom on input focus in iOS */
-input, select, textarea {
+input,
+select,
+textarea {
   font-size: 16px;
 }
 </style>

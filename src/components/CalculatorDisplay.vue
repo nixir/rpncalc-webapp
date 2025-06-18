@@ -26,30 +26,31 @@ const props = defineProps<Props>()
 const stackDisplay = computed(() => {
   const stackLabels = ['T', 'Z', 'Y', 'X']
   const values = [...props.stack]
-  
+
   // Add current input as the last item if in input mode
   if (props.inputMode && props.currentInput) {
     // Convert to number for stack consistency
     values.push(parseFloat(props.currentInput))
   }
-  
+
   // Get the last 4 values (or fewer if stack is smaller)
   const displayValues = values.slice(-4)
-  
+
   // Create stack display items (always 4 rows: T, Z, Y, X)
   return stackLabels.map((label, index) => {
     const valueIndex = index - (4 - displayValues.length)
     const hasValue = valueIndex >= 0
     const value = hasValue ? displayValues[valueIndex] : null
-    const isCurrentInput = hasValue && 
-      props.inputMode && 
-      props.currentInput !== '' && 
+    const isCurrentInput =
+      hasValue &&
+      props.inputMode &&
+      props.currentInput !== '' &&
       valueIndex === displayValues.length - 1
-    
+
     return {
       label,
       value: value !== null ? (isCurrentInput ? props.currentInput : formatNumber(value)) : '',
-      isCurrentInput
+      isCurrentInput,
     }
   })
 })
@@ -58,18 +59,18 @@ const formatNumber = (value: number): string => {
   // Handle special cases
   if (value === 0) return '0'
   if (!isFinite(value)) return 'Error'
-  
+
   // For very large or very small numbers, use scientific notation
   if (Math.abs(value) >= 1e10 || (Math.abs(value) < 1e-6 && value !== 0)) {
     return value.toExponential(6)
   }
-  
+
   // For normal numbers, show up to 10 significant digits
   const str = value.toString()
   if (str.length <= 12) {
     return str
   }
-  
+
   // If still too long, use toPrecision
   return value.toPrecision(10)
 }

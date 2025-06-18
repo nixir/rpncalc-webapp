@@ -7,7 +7,7 @@
         :input-mode="store.inputMode"
       />
     </div>
-    
+
     <div class="calculator-keyboard-area">
       <CalculatorKeyboard @button-press="handleButtonPress" />
     </div>
@@ -37,17 +37,17 @@ const handleButtonPress = (value: string) => {
     case '9':
       store.inputDigit(value)
       break
-    
+
     // Decimal point
     case '.':
       store.inputDecimal()
       break
-    
+
     // Enter
     case 'enter':
       store.enterNumber()
       break
-    
+
     // Operations
     case '+':
     case '-':
@@ -55,32 +55,32 @@ const handleButtonPress = (value: string) => {
     case '÷':
       store.performOperation(value)
       break
-    
+
     // Functions
     case 'toggle-sign':
       store.toggleSign()
       break
-    
+
     case 'eex':
       store.inputEEX()
       break
-    
+
     case 'drop':
       store.dropStack()
       break
-    
+
     case 'swap':
       store.swapStack()
       break
-    
+
     case 'delete':
       store.deleteLastDigit()
       break
-    
+
     case 'undo':
       store.undoLastOperation()
       break
-    
+
     default:
       console.warn('Unknown button pressed:', value)
   }
@@ -89,7 +89,7 @@ const handleButtonPress = (value: string) => {
 const handleKeyboardInput = (event: KeyboardEvent) => {
   // Prevent default behavior for calculator keys
   const key = event.key
-  
+
   switch (key) {
     case '0':
     case '1':
@@ -104,47 +104,47 @@ const handleKeyboardInput = (event: KeyboardEvent) => {
       event.preventDefault()
       store.inputDigit(key)
       break
-    
+
     case '.':
       event.preventDefault()
       store.inputDecimal()
       break
-    
+
     case 'Enter':
       event.preventDefault()
       store.enterNumber()
       break
-    
+
     case '+':
       event.preventDefault()
       store.performOperation('+')
       break
-    
+
     case '-':
       event.preventDefault()
       store.performOperation('-')
       break
-    
+
     case '*':
       event.preventDefault()
       store.performOperation('×')
       break
-    
+
     case '/':
       event.preventDefault()
       store.performOperation('÷')
       break
-    
+
     case 'Backspace':
       event.preventDefault()
       store.deleteLastDigit()
       break
-    
+
     case 'Escape':
       event.preventDefault()
       store.clearAll()
       break
-    
+
     case 'u':
     case 'U':
       if (event.ctrlKey || event.metaKey) {
@@ -177,7 +177,7 @@ onUnmounted(() => {
   width: 100vw;
   background-color: var(--sol-base3);
   overflow: hidden;
-  
+
   /* iPhone safe area support - only top and bottom */
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);

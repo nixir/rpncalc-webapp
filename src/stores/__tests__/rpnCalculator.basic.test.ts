@@ -20,7 +20,7 @@ describe('RPN Calculator Store - Basic Operations', () => {
     it('should enter a single number', () => {
       store.inputDigit('5')
       store.enterNumber()
-      
+
       expect(store.stack).toEqual([5])
       expect(store.currentInput).toBe('')
       expect(store.inputMode).toBe(false)
@@ -33,17 +33,17 @@ describe('RPN Calculator Store - Basic Operations', () => {
       store.inputDigit('3')
       store.enterNumber()
       expect(store.stack).toEqual([3])
-      
+
       // Enter second number: 5 (should lift stack)
       store.inputDigit('5')
       store.enterNumber()
       expect(store.stack).toEqual([3, 5])
-      
+
       // Enter third number: 7 (should lift stack)
       store.inputDigit('7')
       store.enterNumber()
       expect(store.stack).toEqual([3, 5, 7])
-      
+
       // Enter fourth number: 9 (should lift stack)
       store.inputDigit('9')
       store.enterNumber()
@@ -61,7 +61,7 @@ describe('RPN Calculator Store - Basic Operations', () => {
       store.inputDigit('4')
       store.enterNumber()
       expect(store.stack).toEqual([1, 2, 3, 4])
-      
+
       // Enter fifth number - should drop 1 (oldest)
       store.inputDigit('5')
       store.enterNumber()
@@ -76,8 +76,8 @@ describe('RPN Calculator Store - Basic Operations', () => {
       // After: X = 3
       expect(store.stack).toEqual([3])
       expect(store.stack[0]).toBe(3) // X register
-      
-      // Step 2: Second number entry  
+
+      // Step 2: Second number entry
       // Before: X = 3
       store.inputDigit('5')
       store.enterNumber()
@@ -85,7 +85,7 @@ describe('RPN Calculator Store - Basic Operations', () => {
       expect(store.stack).toEqual([3, 5])
       expect(store.stack[0]).toBe(3) // Y register (previous X value)
       expect(store.stack[1]).toBe(5) // X register (new value)
-      
+
       // Step 3: Third number entry
       // Before: Y = 3, X = 5
       store.inputDigit('7')
@@ -99,27 +99,27 @@ describe('RPN Calculator Store - Basic Operations', () => {
 
     it('should properly shift all register positions during stack lift', () => {
       // Build up stack to demonstrate T-Z-Y-X register flow
-      
+
       // Enter 1: X = 1
       store.inputDigit('1')
       store.enterNumber()
       expect(store.stack).toEqual([1]) // [X=1]
-      
+
       // Enter 2: previous X→Y, new value→X
       store.inputDigit('2')
       store.enterNumber()
       expect(store.stack).toEqual([1, 2]) // [Y=1, X=2]
-      
+
       // Enter 3: previous values shift up, new value→X
       store.inputDigit('3')
       store.enterNumber()
       expect(store.stack).toEqual([1, 2, 3]) // [Z=1, Y=2, X=3]
-      
+
       // Enter 4: fill all 4 registers
       store.inputDigit('4')
       store.enterNumber()
       expect(store.stack).toEqual([1, 2, 3, 4]) // [T=1, Z=2, Y=3, X=4]
-      
+
       // Enter 5: T drops off, all others shift up
       store.inputDigit('5')
       store.enterNumber()
@@ -130,30 +130,32 @@ describe('RPN Calculator Store - Basic Operations', () => {
       // Helper function to describe stack state
       const describeStack = (stack: number[]) => {
         const labels = ['T', 'Z', 'Y', 'X']
-        return stack.map((value, index) => `${labels[labels.length - stack.length + index]}=${value}`).join(', ')
+        return stack
+          .map((value, index) => `${labels[labels.length - stack.length + index]}=${value}`)
+          .join(', ')
       }
-      
+
       // Step by step register demonstration
       store.inputDigit('10')
       store.enterNumber()
       expect(describeStack(store.stack)).toBe('X=10')
-      
+
       store.inputDigit('20')
       store.enterNumber()
       expect(describeStack(store.stack)).toBe('Y=10, X=20')
-      
+
       store.inputDigit('30')
       store.enterNumber()
       expect(describeStack(store.stack)).toBe('Z=10, Y=20, X=30')
-      
+
       store.inputDigit('40')
       store.enterNumber()
       expect(describeStack(store.stack)).toBe('T=10, Z=20, Y=30, X=40')
-      
+
       store.inputDigit('50')
       store.enterNumber()
       expect(describeStack(store.stack)).toBe('T=20, Z=30, Y=40, X=50')
-      
+
       // Verify the T register value (10) was dropped
       expect(store.stack).not.toContain(10)
       expect(store.stack).toEqual([20, 30, 40, 50])
@@ -165,7 +167,7 @@ describe('RPN Calculator Store - Basic Operations', () => {
       store.enterNumber()
       expect(store.stack).toEqual([3])
       expect(store.lastOperationWasEnter).toBe(true)
-      
+
       // Press Enter without input - should duplicate X
       store.enterNumber()
       expect(store.stack).toEqual([3, 3])
@@ -177,19 +179,19 @@ describe('RPN Calculator Store - Basic Operations', () => {
       store.enterNumber()
       expect(store.stack).toEqual([5])
       expect(store.lastOperationWasEnter).toBe(true)
-      
+
       // First Enter without input - should duplicate
       store.enterNumber()
       expect(store.stack).toEqual([5, 5])
-      
+
       // Second consecutive Enter - should duplicate again
       store.enterNumber()
       expect(store.stack).toEqual([5, 5, 5])
-      
+
       // Third consecutive Enter - should duplicate again
       store.enterNumber()
       expect(store.stack).toEqual([5, 5, 5, 5])
-      
+
       // Fourth consecutive Enter - should drop oldest and duplicate
       store.enterNumber()
       expect(store.stack).toEqual([5, 5, 5, 5])
@@ -202,22 +204,22 @@ describe('RPN Calculator Store - Basic Operations', () => {
       store.inputDigit('2')
       store.performOperation('+')
       expect(store.stack).toEqual([5])
-      
+
       // Now do consecutive Enter operations
       store.enterNumber() // First duplicate
       expect(store.stack).toEqual([5, 5])
-      
-      store.enterNumber() // Second duplicate  
+
+      store.enterNumber() // Second duplicate
       expect(store.stack).toEqual([5, 5, 5])
-      
+
       // Perform multiplication: 5 * 5 = 25
       store.performOperation('×')
       expect(store.stack).toEqual([5, 25])
-      
+
       // More consecutive Enter operations with new value
       store.enterNumber() // Duplicate 25
       expect(store.stack).toEqual([5, 25, 25])
-      
+
       store.enterNumber() // Duplicate 25 again
       expect(store.stack).toEqual([5, 25, 25, 25])
     })
@@ -227,20 +229,20 @@ describe('RPN Calculator Store - Basic Operations', () => {
       store.inputDigit('7')
       store.enterNumber()
       expect(store.stack).toEqual([7])
-      
+
       // Fill stack with consecutive Enter
       store.enterNumber() // Y=7, X=7
       expect(store.stack).toEqual([7, 7])
-      
-      store.enterNumber() // Z=7, Y=7, X=7  
+
+      store.enterNumber() // Z=7, Y=7, X=7
       expect(store.stack).toEqual([7, 7, 7])
-      
+
       store.enterNumber() // T=7, Z=7, Y=7, X=7
       expect(store.stack).toEqual([7, 7, 7, 7])
-      
+
       // Verify stack is full (4 levels)
       expect(store.stack.length).toBe(4)
-      
+
       // One more Enter should maintain stack at 4 levels
       store.enterNumber()
       expect(store.stack).toEqual([7, 7, 7, 7])
@@ -255,7 +257,7 @@ describe('RPN Calculator Store - Basic Operations', () => {
       store.enterNumber()
       store.inputDigit('5')
       store.performOperation('+')
-      
+
       expect(store.stack).toEqual([8])
     })
 
@@ -264,16 +266,16 @@ describe('RPN Calculator Store - Basic Operations', () => {
       store.inputDigit('3')
       store.enterNumber()
       expect(store.stack).toEqual([3])
-      
-      // 5 Enter 
+
+      // 5 Enter
       store.inputDigit('5')
       store.enterNumber()
       expect(store.stack).toEqual([3, 5])
-      
+
       // * (3 * 5 = 15)
       store.performOperation('×')
       expect(store.stack).toEqual([15])
-      
+
       // 2 / (15 / 2 = 7.5)
       store.inputDigit('2')
       store.performOperation('÷')
@@ -285,11 +287,11 @@ describe('RPN Calculator Store - Basic Operations', () => {
       store.enterNumber()
       store.inputDigit('5')
       store.enterNumber()
-      
+
       // After operation, should allow Enter duplication again
       store.performOperation('+')
       expect(store.stack).toEqual([8])
-      
+
       // This Enter should now duplicate
       store.enterNumber()
       expect(store.stack).toEqual([8, 8])
@@ -302,13 +304,13 @@ describe('RPN Calculator Store - Basic Operations', () => {
       store.enterNumber()
       expect(store.stack).toEqual([5])
       expect(store.lastOperationWasEnter).toBe(true)
-      
+
       // Start new input - should reset flag
       store.inputDigit('3')
       expect(store.lastOperationWasEnter).toBe(false)
       store.enterNumber()
       expect(store.stack).toEqual([5, 3])
-      
+
       // Now Enter should duplicate (consecutive Enter is now allowed)
       store.enterNumber()
       expect(store.stack).toEqual([5, 3, 3])
@@ -319,7 +321,7 @@ describe('RPN Calculator Store - Basic Operations', () => {
       store.inputDigit('5')
       store.enterNumber()
       expect(store.stack).toEqual([0.5])
-      
+
       store.inputDigit('2')
       store.inputDecimal()
       store.inputDigit('5')
@@ -353,10 +355,10 @@ describe('RPN Calculator Store - Basic Operations', () => {
     it('should reset lastOperationWasEnter flag after stack operations', () => {
       // After setup, lastOperationWasEnter should be true from the last enterNumber()
       expect(store.lastOperationWasEnter).toBe(true)
-      
+
       store.dropStack()
       expect(store.lastOperationWasEnter).toBe(false)
-      
+
       // Now Enter should duplicate
       store.enterNumber()
       expect(store.stack).toEqual([1, 2, 2])

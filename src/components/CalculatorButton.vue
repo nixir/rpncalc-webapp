@@ -22,7 +22,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  disabled: false
+  disabled: false,
 })
 
 defineEmits<{
@@ -37,8 +37,8 @@ const buttonClasses = computed(() => [
   props.className,
   {
     'button-disabled': props.disabled,
-    'button-pressed': isPressed.value
-  }
+    'button-pressed': isPressed.value,
+  },
 ])
 
 const onTouchStart = () => {
