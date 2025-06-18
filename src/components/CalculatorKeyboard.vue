@@ -1,6 +1,6 @@
 <template>
   <div class="calculator-keyboard">
-    <!-- Row 1: Enter (2 columns), +/-, EEX -->
+    <!-- Row 1: Enter (3.5 columns), +/-, EEX -->
     <div class="keyboard-row">
       <CalculatorButton
         label="Enter"
@@ -90,15 +90,17 @@ const handleButtonClick = (value: string) => {
   flex: 1;
 }
 
-/* Enter button spans 3 columns (width of 7-8-9) */
+/* Enter button spans 2.5 columns for better alignment */
 .enter-button {
-  flex: 3;
+  flex: 3.5;
 }
 
-/* Empty spacer to create alignment */
+/* Empty spacer to create alignment - accounts for button width + gap */
 .button-spacer {
   flex: 1;
   background: transparent;
+  /* Add margin to account for missing gap */
+  margin-right: 8px;
 }
 
 /* Responsive adjustments */
@@ -113,6 +115,9 @@ const handleButtonClick = (value: string) => {
     min-height: 48px;
     height: calc((100% - 24px) / 5);
   }
+  .button-spacer {
+    margin-right: 6px;
+  }
 }
 
 @media (max-height: 650px) {
@@ -125,6 +130,10 @@ const handleButtonClick = (value: string) => {
     gap: 5px;
     min-height: 44px;
     height: calc((100% - 20px) / 5);
+  }
+
+  .button-spacer {
+    margin-right: 5px;
   }
 }
 
@@ -154,6 +163,10 @@ const handleButtonClick = (value: string) => {
     min-height: 50px;
     height: calc((100% - 24px) / 5);
   }
+
+  .button-spacer {
+    margin-right: 6px;
+  }
 }
 
 @media (max-height: 736px) and (-webkit-device-pixel-ratio: 3) {
@@ -167,6 +180,10 @@ const handleButtonClick = (value: string) => {
     gap: 5px;
     min-height: 46px;
     height: calc((100% - 20px) / 5);
+  }
+
+  .button-spacer {
+    margin-right: 5px;
   }
 }
 
@@ -182,6 +199,9 @@ const handleButtonClick = (value: string) => {
     min-height: 44px;
     height: calc((100% - 16px) / 5);
   }
+  .button-spacer {
+    margin-right: 4px;
+  }
 }
 
 @media (max-width: 400px) {
@@ -192,6 +212,9 @@ const handleButtonClick = (value: string) => {
 
   .keyboard-row {
     gap: 6px;
+  }
+  .button-spacer {
+    margin-right: 6px;
   }
 }
 
@@ -204,6 +227,9 @@ const handleButtonClick = (value: string) => {
   .keyboard-row {
     gap: 4px;
     min-height: 50px;
+  }
+  .button-spacer {
+    margin-right: 4px;
   }
 }
 </style>
