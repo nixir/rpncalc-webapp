@@ -80,19 +80,16 @@ const handleButtonClick = (value: string) => {
 }
 
 .keyboard-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
   gap: 8px;
   height: calc((100% - 32px) / 5);
   min-height: 60px;
 }
 
-.keyboard-row > * {
-  flex: 1;
-}
-
-/* Enter button spans 2.5 columns for better alignment */
+/* Enter button spans exactly 3 columns including gaps */
 .enter-button {
-  flex: 3.5;
+  grid-column: span 3;
 }
 
 /* Empty spacer to create alignment - accounts for button width + gap */
