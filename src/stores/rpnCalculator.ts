@@ -12,7 +12,7 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
   const eexMode = ref<boolean>(false)
   const exponent = ref<string>('')
   const eexJustEntered = ref<boolean>(false)
-  const displayMode = ref<'decimal' | 'binary' | 'octal'>('decimal')
+  const displayMode = ref<'decimal' | 'binary' | 'octal' | 'hexadecimal'>('decimal')
 
   // Helper function for HP-style stack lift
   const liftStack = () => {
@@ -80,6 +80,27 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
     // Positive numbers
     const octalStr = integerPart.toString(8)
     return '0o' + octalStr
+  }
+
+  // Helper function to convert number to hexadecimal string
+  const toHexString = (value: number): string => {
+    // Handle special cases
+    if (value === 0) return '0x0'
+    if (!isFinite(value)) return 'Error'
+
+    // For decimal numbers, only convert the integer part
+    const integerPart = Math.trunc(value)
+
+    // Handle negative numbers using two's complement (32-bit)
+    if (integerPart < 0) {
+      // Convert to 32-bit two's complement then to hexadecimal
+      const twosComplement = (integerPart >>> 0).toString(16).toUpperCase()
+      return '0x' + twosComplement
+    }
+
+    // Positive numbers
+    const hexStr = integerPart.toString(16).toUpperCase()
+    return '0x' + hexStr
   }
 
   // Computed
@@ -332,7 +353,7 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
     eexJustEntered.value = false
   }
 
-  const setDisplayMode = (mode: 'decimal' | 'binary' | 'octal') => {
+  const setDisplayMode = (mode: 'decimal' | 'binary' | 'octal' | 'hexadecimal') => {
     displayMode.value = mode
   }
 
@@ -341,6 +362,8 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
       displayMode.value = 'binary'
     } else if (displayMode.value === 'binary') {
       displayMode.value = 'octal'
+    } else if (displayMode.value === 'octal') {
+      displayMode.value = 'hexadecimal'
     } else {
       displayMode.value = 'decimal'
     }
@@ -365,6 +388,7 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
     // Helpers
     toBinaryString,
     toOctalString,
+    toHexString,
 
     // Actions
     inputDigit,

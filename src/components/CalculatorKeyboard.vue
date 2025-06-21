@@ -22,7 +22,13 @@
         :active="props.displayMode === 'decimal'"
         @click="handleButtonClick"
       />
-      <CalculatorButton label="HEX" value="hex" type="function" @click="handleButtonClick" />
+      <CalculatorButton
+        label="HEX"
+        value="hex"
+        type="function"
+        :active="props.displayMode === 'hexadecimal'"
+        @click="handleButtonClick"
+      />
     </div>
     <!-- Row 1: Enter (3.5 columns), +/-, EEX -->
     <div class="keyboard-row">
@@ -85,7 +91,7 @@
 import CalculatorButton from './CalculatorButton.vue'
 
 interface Props {
-  displayMode?: 'decimal' | 'binary' | 'octal'
+  displayMode?: 'decimal' | 'binary' | 'octal' | 'hexadecimal'
 }
 
 const props = withDefaults(defineProps<Props>(), {

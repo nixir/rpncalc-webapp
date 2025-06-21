@@ -63,17 +63,23 @@ describe('CalculatorKeyboard', () => {
       expect(decButton?.props('active')).toBe(false)
     })
 
-    it('should not activate HEX button regardless of display mode', () => {
+    it('should activate HEX button when display mode is hexadecimal', () => {
       const wrapper = mount(CalculatorKeyboard, {
         props: {
-          displayMode: 'binary',
+          displayMode: 'hexadecimal',
         },
       })
 
       const buttons = wrapper.findAllComponents(CalculatorButton)
+      const binButton = buttons.find((button) => button.props('value') === 'bin')
+      const octButton = buttons.find((button) => button.props('value') === 'oct')
+      const decButton = buttons.find((button) => button.props('value') === 'dec')
       const hexButton = buttons.find((button) => button.props('value') === 'hex')
 
-      expect(hexButton?.props('active')).toBe(false)
+      expect(binButton?.props('active')).toBe(false)
+      expect(octButton?.props('active')).toBe(false)
+      expect(decButton?.props('active')).toBe(false)
+      expect(hexButton?.props('active')).toBe(true)
     })
   })
 
@@ -183,6 +189,60 @@ describe('CalculatorKeyboard', () => {
       decButton = buttons.find((button) => button.props('value') === 'dec')
 
       expect(octButton?.props('active')).toBe(false)
+      expect(decButton?.props('active')).toBe(true)
+    })
+
+    it('should update active states when display mode changes from decimal to hexadecimal', async () => {
+      const wrapper = mount(CalculatorKeyboard, {
+        props: {
+          displayMode: 'decimal',
+        },
+      })
+
+      // Initially DEC should be active
+      let buttons = wrapper.findAllComponents(CalculatorButton)
+      let hexButton = buttons.find((button) => button.props('value') === 'hex')
+      let decButton = buttons.find((button) => button.props('value') === 'dec')
+
+      expect(hexButton?.props('active')).toBe(false)
+      expect(decButton?.props('active')).toBe(true)
+
+      // Change to hexadecimal mode
+      await wrapper.setProps({ displayMode: 'hexadecimal' })
+
+      // Now HEX should be active
+      buttons = wrapper.findAllComponents(CalculatorButton)
+      hexButton = buttons.find((button) => button.props('value') === 'hex')
+      decButton = buttons.find((button) => button.props('value') === 'dec')
+
+      expect(hexButton?.props('active')).toBe(true)
+      expect(decButton?.props('active')).toBe(false)
+    })
+
+    it('should update active states when display mode changes from hexadecimal to decimal', async () => {
+      const wrapper = mount(CalculatorKeyboard, {
+        props: {
+          displayMode: 'hexadecimal',
+        },
+      })
+
+      // Initially HEX should be active
+      let buttons = wrapper.findAllComponents(CalculatorButton)
+      let hexButton = buttons.find((button) => button.props('value') === 'hex')
+      let decButton = buttons.find((button) => button.props('value') === 'dec')
+
+      expect(hexButton?.props('active')).toBe(true)
+      expect(decButton?.props('active')).toBe(false)
+
+      // Change to decimal mode
+      await wrapper.setProps({ displayMode: 'decimal' })
+
+      // Now DEC should be active
+      buttons = wrapper.findAllComponents(CalculatorButton)
+      hexButton = buttons.find((button) => button.props('value') === 'hex')
+      decButton = buttons.find((button) => button.props('value') === 'dec')
+
+      expect(hexButton?.props('active')).toBe(false)
       expect(decButton?.props('active')).toBe(true)
     })
   })

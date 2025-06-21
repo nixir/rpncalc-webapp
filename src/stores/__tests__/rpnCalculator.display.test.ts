@@ -25,13 +25,18 @@ describe('RPN Calculator Store - Display Mode Tests', () => {
       expect(store.displayMode).toBe('octal')
     })
 
+    it('should switch to hexadecimal display mode', () => {
+      store.setDisplayMode('hexadecimal')
+      expect(store.displayMode).toBe('hexadecimal')
+    })
+
     it('should switch to decimal display mode', () => {
       store.setDisplayMode('binary')
       store.setDisplayMode('decimal')
       expect(store.displayMode).toBe('decimal')
     })
 
-    it('should toggle between decimal, binary, and octal modes', () => {
+    it('should toggle between decimal, binary, octal, and hexadecimal modes', () => {
       expect(store.displayMode).toBe('decimal')
 
       store.toggleDisplayMode()
@@ -41,7 +46,53 @@ describe('RPN Calculator Store - Display Mode Tests', () => {
       expect(store.displayMode).toBe('octal')
 
       store.toggleDisplayMode()
+      expect(store.displayMode).toBe('hexadecimal')
+
+      store.toggleDisplayMode()
       expect(store.displayMode).toBe('decimal')
+    })
+  })
+
+  describe('Hexadecimal String Conversion', () => {
+    it('should convert zero to hexadecimal', () => {
+      expect(store.toHexString(0)).toBe('0x0')
+    })
+
+    it('should convert positive integers to hexadecimal', () => {
+      expect(store.toHexString(1)).toBe('0x1')
+      expect(store.toHexString(10)).toBe('0xA')
+      expect(store.toHexString(15)).toBe('0xF')
+      expect(store.toHexString(16)).toBe('0x10')
+      expect(store.toHexString(255)).toBe('0xFF')
+      expect(store.toHexString(4095)).toBe('0xFFF')
+    })
+
+    it("should convert negative integers to hexadecimal (two's complement)", () => {
+      expect(store.toHexString(-1)).toBe('0xFFFFFFFF')
+      expect(store.toHexString(-16)).toBe('0xFFFFFFF0')
+    })
+
+    it('should convert decimal numbers to hexadecimal (integer part only)', () => {
+      expect(store.toHexString(15.7)).toBe('0xF')
+      expect(store.toHexString(255.9)).toBe('0xFF')
+      expect(store.toHexString(-15.14)).toBe('0xFFFFFFF1')
+    })
+
+    it('should handle special values', () => {
+      expect(store.toHexString(Infinity)).toBe('Error')
+      expect(store.toHexString(-Infinity)).toBe('Error')
+      expect(store.toHexString(NaN)).toBe('Error')
+    })
+
+    it('should handle large numbers', () => {
+      expect(store.toHexString(4096)).toBe('0x1000')
+      expect(store.toHexString(65535)).toBe('0xFFFF')
+    })
+
+    it('should use uppercase letters for hex digits', () => {
+      expect(store.toHexString(170)).toBe('0xAA')
+      expect(store.toHexString(187)).toBe('0xBB')
+      expect(store.toHexString(204)).toBe('0xCC')
     })
   })
 

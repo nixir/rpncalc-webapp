@@ -8,6 +8,7 @@
         :display-mode="store.displayMode"
         :to-binary-string="store.toBinaryString"
         :to-octal-string="store.toOctalString"
+        :to-hex-string="store.toHexString"
       />
     </div>
 
@@ -97,8 +98,7 @@ const handleButtonPress = (value: string) => {
       break
 
     case 'hex':
-      // HEX mode not implemented yet
-      console.warn('Display mode not implemented:', value)
+      store.setDisplayMode('hexadecimal')
       break
 
     default:

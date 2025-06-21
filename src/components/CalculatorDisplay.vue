@@ -10,6 +10,7 @@
           'current-input': item.isCurrentInput,
           'binary-mode': displayMode === 'binary',
           'octal-mode': displayMode === 'octal',
+          'hex-mode': displayMode === 'hexadecimal',
         },
       ]"
     >
@@ -19,6 +20,7 @@
         :class="{
           'binary-display': displayMode === 'binary' && item.value.startsWith('0b'),
           'octal-display': displayMode === 'octal' && item.value.startsWith('0o'),
+          'hex-display': displayMode === 'hexadecimal' && item.value.startsWith('0x'),
         }"
       >
         {{ item.value }}
@@ -34,9 +36,10 @@ interface Props {
   stack: number[]
   currentInput: string
   inputMode: boolean
-  displayMode: 'decimal' | 'binary' | 'octal'
+  displayMode: 'decimal' | 'binary' | 'octal' | 'hexadecimal'
   toBinaryString: (value: number) => string
   toOctalString: (value: number) => string
+  toHexString: (value: number) => string
 }
 
 const props = defineProps<Props>()
@@ -82,6 +85,11 @@ const formatNumber = (value: number): string => {
   // Octal mode
   if (props.displayMode === 'octal') {
     return props.toOctalString(value)
+  }
+
+  // Hexadecimal mode
+  if (props.displayMode === 'hexadecimal') {
+    return props.toHexString(value)
   }
 
   // Decimal mode - original logic
@@ -155,6 +163,12 @@ const formatNumber = (value: number): string => {
 /* Octal mode styling for better readability */
 .stack-value.octal-display {
   font-size: 1.7rem;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+}
+
+/* Hexadecimal mode styling for better readability */
+.stack-value.hex-display {
+  font-size: 1.6rem;
   font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
 }
 
