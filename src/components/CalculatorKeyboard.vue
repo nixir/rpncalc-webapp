@@ -8,7 +8,13 @@
         :active="props.displayMode === 'binary'"
         @click="handleButtonClick"
       />
-      <CalculatorButton label="OCT" value="oct" type="function" @click="handleButtonClick" />
+      <CalculatorButton
+        label="OCT"
+        value="oct"
+        type="function"
+        :active="props.displayMode === 'octal'"
+        @click="handleButtonClick"
+      />
       <CalculatorButton
         label="DEC"
         value="dec"
@@ -79,7 +85,7 @@
 import CalculatorButton from './CalculatorButton.vue'
 
 interface Props {
-  displayMode?: 'decimal' | 'binary'
+  displayMode?: 'decimal' | 'binary' | 'octal'
 }
 
 const props = withDefaults(defineProps<Props>(), {

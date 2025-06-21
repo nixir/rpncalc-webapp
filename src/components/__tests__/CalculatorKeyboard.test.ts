@@ -13,8 +13,8 @@ describe('CalculatorKeyboard', () => {
       })
 
       const buttons = wrapper.findAllComponents(CalculatorButton)
-      const binButton = buttons.find(button => button.props('value') === 'bin')
-      const decButton = buttons.find(button => button.props('value') === 'dec')
+      const binButton = buttons.find((button) => button.props('value') === 'bin')
+      const decButton = buttons.find((button) => button.props('value') === 'dec')
 
       expect(binButton?.props('active')).toBe(true)
       expect(decButton?.props('active')).toBe(false)
@@ -28,8 +28,8 @@ describe('CalculatorKeyboard', () => {
       })
 
       const buttons = wrapper.findAllComponents(CalculatorButton)
-      const binButton = buttons.find(button => button.props('value') === 'bin')
-      const decButton = buttons.find(button => button.props('value') === 'dec')
+      const binButton = buttons.find((button) => button.props('value') === 'bin')
+      const decButton = buttons.find((button) => button.props('value') === 'dec')
 
       expect(binButton?.props('active')).toBe(false)
       expect(decButton?.props('active')).toBe(true)
@@ -39,14 +39,31 @@ describe('CalculatorKeyboard', () => {
       const wrapper = mount(CalculatorKeyboard)
 
       const buttons = wrapper.findAllComponents(CalculatorButton)
-      const binButton = buttons.find(button => button.props('value') === 'bin')
-      const decButton = buttons.find(button => button.props('value') === 'dec')
+      const binButton = buttons.find((button) => button.props('value') === 'bin')
+      const decButton = buttons.find((button) => button.props('value') === 'dec')
 
       expect(binButton?.props('active')).toBe(false)
       expect(decButton?.props('active')).toBe(true)
     })
 
-    it('should not activate OCT or HEX buttons regardless of display mode', () => {
+    it('should activate OCT button when display mode is octal', () => {
+      const wrapper = mount(CalculatorKeyboard, {
+        props: {
+          displayMode: 'octal',
+        },
+      })
+
+      const buttons = wrapper.findAllComponents(CalculatorButton)
+      const binButton = buttons.find((button) => button.props('value') === 'bin')
+      const octButton = buttons.find((button) => button.props('value') === 'oct')
+      const decButton = buttons.find((button) => button.props('value') === 'dec')
+
+      expect(binButton?.props('active')).toBe(false)
+      expect(octButton?.props('active')).toBe(true)
+      expect(decButton?.props('active')).toBe(false)
+    })
+
+    it('should not activate HEX button regardless of display mode', () => {
       const wrapper = mount(CalculatorKeyboard, {
         props: {
           displayMode: 'binary',
@@ -54,10 +71,8 @@ describe('CalculatorKeyboard', () => {
       })
 
       const buttons = wrapper.findAllComponents(CalculatorButton)
-      const octButton = buttons.find(button => button.props('value') === 'oct')
-      const hexButton = buttons.find(button => button.props('value') === 'hex')
+      const hexButton = buttons.find((button) => button.props('value') === 'hex')
 
-      expect(octButton?.props('active')).toBe(false)
       expect(hexButton?.props('active')).toBe(false)
     })
   })
@@ -72,9 +87,9 @@ describe('CalculatorKeyboard', () => {
 
       // Initially DEC should be active
       let buttons = wrapper.findAllComponents(CalculatorButton)
-      let binButton = buttons.find(button => button.props('value') === 'bin')
-      let decButton = buttons.find(button => button.props('value') === 'dec')
-      
+      let binButton = buttons.find((button) => button.props('value') === 'bin')
+      let decButton = buttons.find((button) => button.props('value') === 'dec')
+
       expect(binButton?.props('active')).toBe(false)
       expect(decButton?.props('active')).toBe(true)
 
@@ -83,8 +98,8 @@ describe('CalculatorKeyboard', () => {
 
       // Now BIN should be active
       buttons = wrapper.findAllComponents(CalculatorButton)
-      binButton = buttons.find(button => button.props('value') === 'bin')
-      decButton = buttons.find(button => button.props('value') === 'dec')
+      binButton = buttons.find((button) => button.props('value') === 'bin')
+      decButton = buttons.find((button) => button.props('value') === 'dec')
 
       expect(binButton?.props('active')).toBe(true)
       expect(decButton?.props('active')).toBe(false)
@@ -99,9 +114,9 @@ describe('CalculatorKeyboard', () => {
 
       // Initially BIN should be active
       let buttons = wrapper.findAllComponents(CalculatorButton)
-      let binButton = buttons.find(button => button.props('value') === 'bin')
-      let decButton = buttons.find(button => button.props('value') === 'dec')
-      
+      let binButton = buttons.find((button) => button.props('value') === 'bin')
+      let decButton = buttons.find((button) => button.props('value') === 'dec')
+
       expect(binButton?.props('active')).toBe(true)
       expect(decButton?.props('active')).toBe(false)
 
@@ -110,10 +125,64 @@ describe('CalculatorKeyboard', () => {
 
       // Now DEC should be active
       buttons = wrapper.findAllComponents(CalculatorButton)
-      binButton = buttons.find(button => button.props('value') === 'bin')
-      decButton = buttons.find(button => button.props('value') === 'dec')
+      binButton = buttons.find((button) => button.props('value') === 'bin')
+      decButton = buttons.find((button) => button.props('value') === 'dec')
 
       expect(binButton?.props('active')).toBe(false)
+      expect(decButton?.props('active')).toBe(true)
+    })
+
+    it('should update active states when display mode changes from decimal to octal', async () => {
+      const wrapper = mount(CalculatorKeyboard, {
+        props: {
+          displayMode: 'decimal',
+        },
+      })
+
+      // Initially DEC should be active
+      let buttons = wrapper.findAllComponents(CalculatorButton)
+      let octButton = buttons.find((button) => button.props('value') === 'oct')
+      let decButton = buttons.find((button) => button.props('value') === 'dec')
+
+      expect(octButton?.props('active')).toBe(false)
+      expect(decButton?.props('active')).toBe(true)
+
+      // Change to octal mode
+      await wrapper.setProps({ displayMode: 'octal' })
+
+      // Now OCT should be active
+      buttons = wrapper.findAllComponents(CalculatorButton)
+      octButton = buttons.find((button) => button.props('value') === 'oct')
+      decButton = buttons.find((button) => button.props('value') === 'dec')
+
+      expect(octButton?.props('active')).toBe(true)
+      expect(decButton?.props('active')).toBe(false)
+    })
+
+    it('should update active states when display mode changes from octal to decimal', async () => {
+      const wrapper = mount(CalculatorKeyboard, {
+        props: {
+          displayMode: 'octal',
+        },
+      })
+
+      // Initially OCT should be active
+      let buttons = wrapper.findAllComponents(CalculatorButton)
+      let octButton = buttons.find((button) => button.props('value') === 'oct')
+      let decButton = buttons.find((button) => button.props('value') === 'dec')
+
+      expect(octButton?.props('active')).toBe(true)
+      expect(decButton?.props('active')).toBe(false)
+
+      // Change to decimal mode
+      await wrapper.setProps({ displayMode: 'decimal' })
+
+      // Now DEC should be active
+      buttons = wrapper.findAllComponents(CalculatorButton)
+      octButton = buttons.find((button) => button.props('value') === 'oct')
+      decButton = buttons.find((button) => button.props('value') === 'dec')
+
+      expect(octButton?.props('active')).toBe(false)
       expect(decButton?.props('active')).toBe(true)
     })
   })
@@ -127,7 +196,7 @@ describe('CalculatorKeyboard', () => {
       })
 
       const buttons = wrapper.findAllComponents(CalculatorButton)
-      const binButton = buttons.find(button => button.props('value') === 'bin')
+      const binButton = buttons.find((button) => button.props('value') === 'bin')
 
       await binButton?.trigger('click')
 
@@ -143,7 +212,7 @@ describe('CalculatorKeyboard', () => {
       })
 
       const buttons = wrapper.findAllComponents(CalculatorButton)
-      const decButton = buttons.find(button => button.props('value') === 'dec')
+      const decButton = buttons.find((button) => button.props('value') === 'dec')
 
       await decButton?.trigger('click')
 
@@ -155,7 +224,7 @@ describe('CalculatorKeyboard', () => {
       const wrapper = mount(CalculatorKeyboard)
 
       const buttons = wrapper.findAllComponents(CalculatorButton)
-      
+
       // Test a few different button types
       const testButtons = [
         { value: 'bin', label: 'BIN' },
@@ -165,7 +234,7 @@ describe('CalculatorKeyboard', () => {
       ]
 
       for (const testButton of testButtons) {
-        const button = buttons.find(b => b.props('value') === testButton.value)
+        const button = buttons.find((b) => b.props('value') === testButton.value)
         if (button) {
           await button.trigger('click')
           expect(wrapper.emitted('buttonPress')).toBeTruthy()
@@ -182,7 +251,7 @@ describe('CalculatorKeyboard', () => {
       const displayModeButtons = ['bin', 'oct', 'dec', 'hex']
 
       for (const buttonValue of displayModeButtons) {
-        const button = buttons.find(b => b.props('value') === buttonValue)
+        const button = buttons.find((b) => b.props('value') === buttonValue)
         expect(button).toBeTruthy()
       }
     })
@@ -194,7 +263,7 @@ describe('CalculatorKeyboard', () => {
       const numericButtons = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
       for (const buttonValue of numericButtons) {
-        const button = buttons.find(b => b.props('value') === buttonValue)
+        const button = buttons.find((b) => b.props('value') === buttonValue)
         expect(button).toBeTruthy()
       }
     })
@@ -206,7 +275,7 @@ describe('CalculatorKeyboard', () => {
       const operatorButtons = ['+', '-', '×', '÷']
 
       for (const buttonValue of operatorButtons) {
-        const button = buttons.find(b => b.props('value') === buttonValue)
+        const button = buttons.find((b) => b.props('value') === buttonValue)
         expect(button).toBeTruthy()
       }
     })
@@ -218,7 +287,7 @@ describe('CalculatorKeyboard', () => {
       const functionButtons = ['enter', 'toggle-sign', 'eex', 'delete', 'undo', 'swap', 'drop']
 
       for (const buttonValue of functionButtons) {
-        const button = buttons.find(b => b.props('value') === buttonValue)
+        const button = buttons.find((b) => b.props('value') === buttonValue)
         expect(button).toBeTruthy()
       }
     })
@@ -233,7 +302,7 @@ describe('CalculatorKeyboard', () => {
       })
 
       const buttons = wrapper.findAllComponents(CalculatorButton)
-      const binButton = buttons.find(button => button.props('value') === 'bin')
+      const binButton = buttons.find((button) => button.props('value') === 'bin')
 
       expect(binButton?.props('active')).toBe(true)
       expect(binButton?.classes()).toContain('button-active')
@@ -247,7 +316,7 @@ describe('CalculatorKeyboard', () => {
       })
 
       const buttons = wrapper.findAllComponents(CalculatorButton)
-      const decButton = buttons.find(button => button.props('value') === 'dec')
+      const decButton = buttons.find((button) => button.props('value') === 'dec')
 
       expect(decButton?.props('active')).toBe(true)
       expect(decButton?.classes()).toContain('button-active')
@@ -260,7 +329,7 @@ describe('CalculatorKeyboard', () => {
       const displayModeButtons = ['bin', 'oct', 'dec', 'hex']
 
       for (const buttonValue of displayModeButtons) {
-        const button = buttons.find(b => b.props('value') === buttonValue)
+        const button = buttons.find((b) => b.props('value') === buttonValue)
         expect(button?.props('type')).toBe('function')
       }
     })

@@ -7,6 +7,7 @@
         :input-mode="store.inputMode"
         :display-mode="store.displayMode"
         :to-binary-string="store.toBinaryString"
+        :to-octal-string="store.toOctalString"
       />
     </div>
 
@@ -92,8 +93,11 @@ const handleButtonPress = (value: string) => {
       break
 
     case 'oct':
+      store.setDisplayMode('octal')
+      break
+
     case 'hex':
-      // OCT and HEX modes not implemented yet
+      // HEX mode not implemented yet
       console.warn('Display mode not implemented:', value)
       break
 

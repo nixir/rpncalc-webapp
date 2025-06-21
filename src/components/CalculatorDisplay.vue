@@ -6,13 +6,20 @@
       :key="`stack-${index}`"
       :class="[
         'stack-item',
-        { 'current-input': item.isCurrentInput, 'binary-mode': displayMode === 'binary' },
+        {
+          'current-input': item.isCurrentInput,
+          'binary-mode': displayMode === 'binary',
+          'octal-mode': displayMode === 'octal',
+        },
       ]"
     >
       <div class="stack-label">{{ item.label }}</div>
       <div
         class="stack-value"
-        :class="{ 'binary-display': displayMode === 'binary' && item.value.startsWith('0b') }"
+        :class="{
+          'binary-display': displayMode === 'binary' && item.value.startsWith('0b'),
+          'octal-display': displayMode === 'octal' && item.value.startsWith('0o'),
+        }"
       >
         {{ item.value }}
       </div>
@@ -27,8 +34,9 @@ interface Props {
   stack: number[]
   currentInput: string
   inputMode: boolean
-  displayMode: 'decimal' | 'binary'
+  displayMode: 'decimal' | 'binary' | 'octal'
   toBinaryString: (value: number) => string
+  toOctalString: (value: number) => string
 }
 
 const props = defineProps<Props>()
@@ -69,6 +77,11 @@ const formatNumber = (value: number): string => {
   // Binary mode
   if (props.displayMode === 'binary') {
     return props.toBinaryString(value)
+  }
+
+  // Octal mode
+  if (props.displayMode === 'octal') {
+    return props.toOctalString(value)
   }
 
   // Decimal mode - original logic
@@ -136,6 +149,12 @@ const formatNumber = (value: number): string => {
 /* Binary mode styling for better readability */
 .stack-value.binary-display {
   font-size: 1.6rem;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+}
+
+/* Octal mode styling for better readability */
+.stack-value.octal-display {
+  font-size: 1.7rem;
   font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
 }
 

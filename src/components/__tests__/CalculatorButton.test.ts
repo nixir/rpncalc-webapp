@@ -54,7 +54,7 @@ describe('CalculatorButton', () => {
 
       // Simulate touch start to trigger pressed state
       await wrapper.trigger('touchstart')
-      
+
       expect(wrapper.classes()).toContain('button-active')
       expect(wrapper.classes()).toContain('button-pressed')
     })

@@ -12,7 +12,7 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
   const eexMode = ref<boolean>(false)
   const exponent = ref<string>('')
   const eexJustEntered = ref<boolean>(false)
-  const displayMode = ref<'decimal' | 'binary'>('decimal')
+  const displayMode = ref<'decimal' | 'binary' | 'octal'>('decimal')
 
   // Helper function for HP-style stack lift
   const liftStack = () => {
@@ -59,6 +59,27 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
     // Positive numbers
     const binaryStr = integerPart.toString(2)
     return '0b' + binaryStr
+  }
+
+  // Helper function to convert number to octal string
+  const toOctalString = (value: number): string => {
+    // Handle special cases
+    if (value === 0) return '0o0'
+    if (!isFinite(value)) return 'Error'
+
+    // For decimal numbers, only convert the integer part
+    const integerPart = Math.trunc(value)
+
+    // Handle negative numbers using two's complement (32-bit)
+    if (integerPart < 0) {
+      // Convert to 32-bit two's complement then to octal
+      const twosComplement = (integerPart >>> 0).toString(8)
+      return '0o' + twosComplement
+    }
+
+    // Positive numbers
+    const octalStr = integerPart.toString(8)
+    return '0o' + octalStr
   }
 
   // Computed
@@ -311,12 +332,18 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
     eexJustEntered.value = false
   }
 
-  const setDisplayMode = (mode: 'decimal' | 'binary') => {
+  const setDisplayMode = (mode: 'decimal' | 'binary' | 'octal') => {
     displayMode.value = mode
   }
 
   const toggleDisplayMode = () => {
-    displayMode.value = displayMode.value === 'decimal' ? 'binary' : 'decimal'
+    if (displayMode.value === 'decimal') {
+      displayMode.value = 'binary'
+    } else if (displayMode.value === 'binary') {
+      displayMode.value = 'octal'
+    } else {
+      displayMode.value = 'decimal'
+    }
   }
 
   return {
@@ -337,6 +364,7 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
 
     // Helpers
     toBinaryString,
+    toOctalString,
 
     // Actions
     inputDigit,

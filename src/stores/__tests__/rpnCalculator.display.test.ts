@@ -20,20 +20,64 @@ describe('RPN Calculator Store - Display Mode Tests', () => {
       expect(store.displayMode).toBe('binary')
     })
 
+    it('should switch to octal display mode', () => {
+      store.setDisplayMode('octal')
+      expect(store.displayMode).toBe('octal')
+    })
+
     it('should switch to decimal display mode', () => {
       store.setDisplayMode('binary')
       store.setDisplayMode('decimal')
       expect(store.displayMode).toBe('decimal')
     })
 
-    it('should toggle between decimal and binary modes', () => {
+    it('should toggle between decimal, binary, and octal modes', () => {
       expect(store.displayMode).toBe('decimal')
 
       store.toggleDisplayMode()
       expect(store.displayMode).toBe('binary')
 
       store.toggleDisplayMode()
+      expect(store.displayMode).toBe('octal')
+
+      store.toggleDisplayMode()
       expect(store.displayMode).toBe('decimal')
+    })
+  })
+
+  describe('Octal String Conversion', () => {
+    it('should convert zero to octal', () => {
+      expect(store.toOctalString(0)).toBe('0o0')
+    })
+
+    it('should convert positive integers to octal', () => {
+      expect(store.toOctalString(1)).toBe('0o1')
+      expect(store.toOctalString(8)).toBe('0o10')
+      expect(store.toOctalString(15)).toBe('0o17')
+      expect(store.toOctalString(64)).toBe('0o100')
+      expect(store.toOctalString(255)).toBe('0o377')
+    })
+
+    it("should convert negative integers to octal (two's complement)", () => {
+      expect(store.toOctalString(-1)).toBe('0o37777777777')
+      expect(store.toOctalString(-8)).toBe('0o37777777770')
+    })
+
+    it('should convert decimal numbers to octal (integer part only)', () => {
+      expect(store.toOctalString(8.7)).toBe('0o10')
+      expect(store.toOctalString(15.9)).toBe('0o17')
+      expect(store.toOctalString(-7.14)).toBe('0o37777777771')
+    })
+
+    it('should handle special values', () => {
+      expect(store.toOctalString(Infinity)).toBe('Error')
+      expect(store.toOctalString(-Infinity)).toBe('Error')
+      expect(store.toOctalString(NaN)).toBe('Error')
+    })
+
+    it('should handle large numbers', () => {
+      expect(store.toOctalString(512)).toBe('0o1000')
+      expect(store.toOctalString(4095)).toBe('0o7777')
     })
   })
 
