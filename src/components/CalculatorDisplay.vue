@@ -21,6 +21,7 @@
           'binary-display': displayMode === 'binary' && item.value.startsWith('0b'),
           'octal-display': displayMode === 'octal' && item.value.startsWith('0o'),
           'hex-display': displayMode === 'hexadecimal' && item.value.startsWith('0x'),
+          'decimal-display': displayMode === 'decimal',
         }"
       >
         {{ item.value }}
@@ -170,6 +171,11 @@ const formatNumber = (value: number): string => {
 .stack-value.hex-display {
   font-size: 1.6rem;
   font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+}
+
+/* Decimal mode styling for consistent font size */
+.stack-value.decimal-display {
+  font-size: 2rem;
 }
 
 .stack-item.current-input .stack-value {
