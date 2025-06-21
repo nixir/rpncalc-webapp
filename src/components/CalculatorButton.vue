@@ -1,7 +1,8 @@
 <template>
   <button
     :class="buttonClasses"
-    @click="$emit('click', value)"
+    :disabled="disabled"
+    @click="handleClick"
     @touchstart.passive="onTouchStart"
     @touchend.passive="onTouchEnd"
   >
@@ -27,7 +28,7 @@ const props = withDefaults(defineProps<Props>(), {
   active: false,
 })
 
-defineEmits<{
+const emit = defineEmits<{
   click: [value: string]
 }>()
 
@@ -52,6 +53,12 @@ const onTouchStart = () => {
 
 const onTouchEnd = () => {
   isPressed.value = false
+}
+
+const handleClick = () => {
+  if (!props.disabled) {
+    emit('click', props.value)
+  }
 }
 </script>
 
