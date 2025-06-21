@@ -162,30 +162,30 @@ const formatNumber = (value: number): string => {
 /* Responsive font sizes */
 @media (max-height: 700px) {
   .stack-value {
-    font-size: 1.6rem;
+    font-size: 2rem;
   }
   .stack-item {
     min-height: 2rem;
   }
   .stack-label {
-    font-size: 0.9rem;
+    font-size: 2rem;
   }
 }
 
 @media (max-height: 600px) {
   .stack-value {
-    font-size: 1.4rem;
+    font-size: 1.8rem;
   }
   .stack-item {
     min-height: 1.8rem;
   }
   .stack-label {
-    font-size: 0.8rem;
+    font-size: 1.8rem;
   }
 }
 
 /* Adjust text size if number is too long */
 .stack-value {
-  font-size: clamp(1.2rem, 4vw, 2rem);
+  font-size: clamp(1.2rem, 4vw, 2remå);
 }
 </style>
