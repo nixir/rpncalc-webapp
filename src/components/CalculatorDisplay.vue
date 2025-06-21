@@ -162,25 +162,25 @@ const formatNumber = (value: number): string => {
 /* Responsive font sizes */
 @media (max-height: 700px) {
   .stack-value {
-    font-size: 1.6rem;
+    font-size: 2rem;
   }
   .stack-item {
     min-height: 2rem;
   }
   .stack-label {
-    font-size: 0.9rem;
+    font-size: 2rem;
   }
 }
 
 @media (max-height: 600px) {
   .stack-value {
-    font-size: 1.4rem;
+    font-size: 1.8rem;
   }
   .stack-item {
     min-height: 1.8rem;
   }
   .stack-label {
-    font-size: 0.8rem;
+    font-size: 1.8rem;
   }
 }
 
