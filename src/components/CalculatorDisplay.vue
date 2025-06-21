@@ -4,11 +4,14 @@
     <div
       v-for="(item, index) in stackDisplay"
       :key="`stack-${index}`"
-      :class="['stack-item', { 'current-input': item.isCurrentInput, 'binary-mode': displayMode === 'binary' }]"
+      :class="[
+        'stack-item',
+        { 'current-input': item.isCurrentInput, 'binary-mode': displayMode === 'binary' },
+      ]"
     >
       <div class="stack-label">{{ item.label }}</div>
-      <div 
-        class="stack-value" 
+      <div
+        class="stack-value"
         :class="{ 'binary-display': displayMode === 'binary' && item.value.startsWith('0b') }"
       >
         {{ item.value }}

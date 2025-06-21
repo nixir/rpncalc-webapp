@@ -45,17 +45,17 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
     // Handle special cases
     if (value === 0) return '0b0'
     if (!isFinite(value)) return 'Error'
-    
+
     // For decimal numbers, only convert the integer part
     const integerPart = Math.trunc(value)
-    
+
     // Handle negative numbers using two's complement (32-bit)
     if (integerPart < 0) {
       // Convert to 32-bit two's complement
       const twosComplement = (integerPart >>> 0).toString(2)
       return '0b' + twosComplement
     }
-    
+
     // Positive numbers
     const binaryStr = integerPart.toString(2)
     return '0b' + binaryStr

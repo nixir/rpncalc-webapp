@@ -45,6 +45,11 @@ This is a Vue 3 + TypeScript web application for an RPN (Reverse Polish Notation
 
 - Vite base path is set to `/rpncalc-webapp/` for GitHub Pages deployment
 
+**Project rules**
+
+- コミット前にフォーマッタをかける。
+- コミット前にLintをかける
+
 **Output:**
 
 - 出力は全て日本語

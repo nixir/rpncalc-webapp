@@ -11,7 +11,7 @@
     </div>
 
     <div class="calculator-keyboard-area">
-      <CalculatorKeyboard @button-press="handleButtonPress" />
+      <CalculatorKeyboard :display-mode="store.displayMode" @button-press="handleButtonPress" />
     </div>
   </div>
 </template>

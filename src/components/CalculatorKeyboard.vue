@@ -5,26 +5,18 @@
         label="BIN"
         value="bin"
         type="function"
+        :active="props.displayMode === 'binary'"
         @click="handleButtonClick"
       />
-      <CalculatorButton
-        label="OCT"
-        value="oct"
-        type="function"
-        @click="handleButtonClick"
-      />
+      <CalculatorButton label="OCT" value="oct" type="function" @click="handleButtonClick" />
       <CalculatorButton
         label="DEC"
         value="dec"
         type="function"
+        :active="props.displayMode === 'decimal'"
         @click="handleButtonClick"
       />
-      <CalculatorButton
-        label="HEX"
-        value="hex"
-        type="function"
-        @click="handleButtonClick"
-      />
+      <CalculatorButton label="HEX" value="hex" type="function" @click="handleButtonClick" />
     </div>
     <!-- Row 1: Enter (3.5 columns), +/-, EEX -->
     <div class="keyboard-row">
@@ -85,6 +77,14 @@
 
 <script setup lang="ts">
 import CalculatorButton from './CalculatorButton.vue'
+
+interface Props {
+  displayMode?: 'decimal' | 'binary'
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  displayMode: 'decimal',
+})
 
 const emit = defineEmits<{
   buttonPress: [value: string]

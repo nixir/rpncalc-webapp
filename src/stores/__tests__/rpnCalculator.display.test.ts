@@ -28,10 +28,10 @@ describe('RPN Calculator Store - Display Mode Tests', () => {
 
     it('should toggle between decimal and binary modes', () => {
       expect(store.displayMode).toBe('decimal')
-      
+
       store.toggleDisplayMode()
       expect(store.displayMode).toBe('binary')
-      
+
       store.toggleDisplayMode()
       expect(store.displayMode).toBe('decimal')
     })
@@ -49,7 +49,7 @@ describe('RPN Calculator Store - Display Mode Tests', () => {
       expect(store.toBinaryString(255)).toBe('0b11111111')
     })
 
-    it('should convert negative integers to binary (two\'s complement)', () => {
+    it("should convert negative integers to binary (two's complement)", () => {
       expect(store.toBinaryString(-1)).toBe('0b11111111111111111111111111111111')
       expect(store.toBinaryString(-5)).toBe('0b11111111111111111111111111111011')
     })
@@ -201,12 +201,12 @@ describe('RPN Calculator Store - Display Mode Tests', () => {
       store.enterNumber()
       store.inputDigit('7')
       store.performOperation('÷')
-      
+
       const decimalResult = store.stack[0]
 
       // Switch to binary mode
       store.setDisplayMode('binary')
-      
+
       // Result should be the same
       expect(store.stack[0]).toBe(decimalResult)
 
@@ -277,7 +277,7 @@ describe('RPN Calculator Store - Display Mode Tests', () => {
 
     it('should preserve display mode through clear operations', () => {
       store.setDisplayMode('binary')
-      
+
       // Add some values
       store.inputDigit('5')
       store.enterNumber()
@@ -301,26 +301,26 @@ describe('RPN Calculator Store - Display Mode Tests', () => {
 
     it('should handle zero division in binary mode', () => {
       store.setDisplayMode('binary')
-      
+
       store.inputDigit('5')
       store.enterNumber()
       store.inputDigit('0')
       store.performOperation('÷')
-      
+
       expect(store.stack).toEqual([0])
     })
 
     it('should handle repeated Enter operations in binary mode', () => {
       store.setDisplayMode('binary')
-      
+
       store.inputDigit('7')
       store.enterNumber()
-      
+
       // Multiple Enter operations
       store.enterNumber()
       store.enterNumber()
       store.enterNumber()
-      
+
       expect(store.stack).toEqual([7, 7, 7, 7])
     })
   })
