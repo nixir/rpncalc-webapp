@@ -18,9 +18,9 @@
       <div
         class="stack-value"
         :class="{
-          'binary-display': displayMode === 'binary' && item.value.startsWith('0b'),
-          'octal-display': displayMode === 'octal' && item.value.startsWith('0o'),
-          'hex-display': displayMode === 'hexadecimal' && item.value.startsWith('0x'),
+          'binary-display': item.value.startsWith('0b'),
+          'octal-display': item.value.startsWith('0o'),
+          'hex-display': item.value.startsWith('0x'),
         }"
       >
         {{ item.value }}
@@ -136,7 +136,7 @@ const formatNumber = (value: number): string => {
 
 .stack-label {
   flex: 0 0 auto;
-  font-size: 1rem;
+  font-size: 2rem;
   font-weight: 500;
   color: var(--sol-base1);
   width: 1.5rem;
@@ -152,24 +152,6 @@ const formatNumber = (value: number): string => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-/* Binary mode styling for better readability */
-.stack-value.binary-display {
-  font-size: 1.6rem;
-  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
-}
-
-/* Octal mode styling for better readability */
-.stack-value.octal-display {
-  font-size: 1.7rem;
-  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
-}
-
-/* Hexadecimal mode styling for better readability */
-.stack-value.hex-display {
-  font-size: 1.6rem;
-  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
 }
 
 .stack-item.current-input .stack-value {
