@@ -186,6 +186,6 @@ const formatNumber = (value: number): string => {
 
 /* Adjust text size if number is too long */
 .stack-value {
-  font-size: clamp(1.2rem, 4vw, 2remå);
+  font-size: clamp(1.2rem, 4vw, 2rem);
 }
 </style>
