@@ -4,10 +4,15 @@
     <div
       v-for="(item, index) in stackDisplay"
       :key="`stack-${index}`"
-      :class="['stack-item', { 'current-input': item.isCurrentInput }]"
+      :class="['stack-item', { 'current-input': item.isCurrentInput, 'binary-mode': displayMode === 'binary' }]"
     >
       <div class="stack-label">{{ item.label }}</div>
-      <div class="stack-value">{{ item.value }}</div>
+      <div 
+        class="stack-value" 
+        :class="{ 'binary-display': displayMode === 'binary' && item.value.startsWith('0b') }"
+      >
+        {{ item.value }}
+      </div>
     </div>
   </div>
 </template>
@@ -19,6 +24,8 @@ interface Props {
   stack: number[]
   currentInput: string
   inputMode: boolean
+  displayMode: 'decimal' | 'binary'
+  toBinaryString: (value: number) => string
 }
 
 const props = defineProps<Props>()
@@ -56,6 +63,12 @@ const stackDisplay = computed(() => {
 })
 
 const formatNumber = (value: number): string => {
+  // Binary mode
+  if (props.displayMode === 'binary') {
+    return props.toBinaryString(value)
+  }
+
+  // Decimal mode - original logic
   // Handle special cases
   if (value === 0) return '0'
   if (!isFinite(value)) return 'Error'
@@ -115,6 +128,12 @@ const formatNumber = (value: number): string => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Binary mode styling for better readability */
+.stack-value.binary-display {
+  font-size: 1.6rem;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
 }
 
 .stack-item.current-input .stack-value {
