@@ -5,6 +5,8 @@
         :stack="store.stack"
         :current-input="store.currentDisplay"
         :input-mode="store.inputMode"
+        :display-mode="store.displayMode"
+        :to-binary-string="store.toBinaryString"
       />
     </div>
 
@@ -79,6 +81,20 @@ const handleButtonPress = (value: string) => {
 
     case 'undo':
       store.undoLastOperation()
+      break
+
+    case 'bin':
+      store.setDisplayMode('binary')
+      break
+
+    case 'dec':
+      store.setDisplayMode('decimal')
+      break
+
+    case 'oct':
+    case 'hex':
+      // OCT and HEX modes not implemented yet
+      console.warn('Display mode not implemented:', value)
       break
 
     default:

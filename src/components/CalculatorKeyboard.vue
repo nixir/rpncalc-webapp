@@ -1,5 +1,31 @@
 <template>
   <div class="calculator-keyboard">
+    <div class="keyboard-row">
+      <CalculatorButton
+        label="BIN"
+        value="bin"
+        type="function"
+        @click="handleButtonClick"
+      />
+      <CalculatorButton
+        label="OCT"
+        value="oct"
+        type="function"
+        @click="handleButtonClick"
+      />
+      <CalculatorButton
+        label="DEC"
+        value="dec"
+        type="function"
+        @click="handleButtonClick"
+      />
+      <CalculatorButton
+        label="HEX"
+        value="hex"
+        type="function"
+        @click="handleButtonClick"
+      />
+    </div>
     <!-- Row 1: Enter (3.5 columns), +/-, EEX -->
     <div class="keyboard-row">
       <CalculatorButton
@@ -87,7 +113,7 @@ const handleButtonClick = (value: string) => {
   min-height: 60px;
 }
 
-/* Enter button spans exactly 3 columns including gaps */
+/* Enter button spans exactly 2 columns including gaps */
 .enter-button {
   grid-column: span 3;
 }

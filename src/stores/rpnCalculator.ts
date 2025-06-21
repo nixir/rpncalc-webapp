@@ -12,6 +12,7 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
   const eexMode = ref<boolean>(false)
   const exponent = ref<string>('')
   const eexJustEntered = ref<boolean>(false)
+  const displayMode = ref<'decimal' | 'binary'>('decimal')
 
   // Helper function for HP-style stack lift
   const liftStack = () => {
@@ -37,6 +38,27 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
     }
 
     return mantissa * Math.pow(10, exp)
+  }
+
+  // Helper function to convert number to binary string
+  const toBinaryString = (value: number): string => {
+    // Handle special cases
+    if (value === 0) return '0b0'
+    if (!isFinite(value)) return 'Error'
+    
+    // For decimal numbers, only convert the integer part
+    const integerPart = Math.trunc(value)
+    
+    // Handle negative numbers using two's complement (32-bit)
+    if (integerPart < 0) {
+      // Convert to 32-bit two's complement
+      const twosComplement = (integerPart >>> 0).toString(2)
+      return '0b' + twosComplement
+    }
+    
+    // Positive numbers
+    const binaryStr = integerPart.toString(2)
+    return '0b' + binaryStr
   }
 
   // Computed
@@ -289,6 +311,14 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
     eexJustEntered.value = false
   }
 
+  const setDisplayMode = (mode: 'decimal' | 'binary') => {
+    displayMode.value = mode
+  }
+
+  const toggleDisplayMode = () => {
+    displayMode.value = displayMode.value === 'decimal' ? 'binary' : 'decimal'
+  }
+
   return {
     // State
     stack,
@@ -299,10 +329,14 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
     eexMode,
     exponent,
     eexJustEntered,
+    displayMode,
 
     // Computed
     displayStack,
     currentDisplay,
+
+    // Helpers
+    toBinaryString,
 
     // Actions
     inputDigit,
@@ -316,5 +350,7 @@ export const useRPNStore = defineStore('rpnCalculator', () => {
     deleteLastDigit,
     undoLastOperation,
     clearAll,
+    setDisplayMode,
+    toggleDisplayMode,
   }
 })
