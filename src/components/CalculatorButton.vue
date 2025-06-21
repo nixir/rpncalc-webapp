@@ -1,7 +1,8 @@
 <template>
   <button
     :class="buttonClasses"
-    @click="$emit('click', value)"
+    :disabled="disabled"
+    @click="handleClick"
     @touchstart.passive="onTouchStart"
     @touchend.passive="onTouchEnd"
   >
@@ -19,13 +20,15 @@ interface Props {
   type: ButtonType
   className?: string
   disabled?: boolean
+  active?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   disabled: false,
+  active: false,
 })
 
-defineEmits<{
+const emit = defineEmits<{
   click: [value: string]
 }>()
 
@@ -38,6 +41,7 @@ const buttonClasses = computed(() => [
   {
     'button-disabled': props.disabled,
     'button-pressed': isPressed.value,
+    'button-active': props.active,
   },
 ])
 
@@ -49,6 +53,12 @@ const onTouchStart = () => {
 
 const onTouchEnd = () => {
   isPressed.value = false
+}
+
+const handleClick = () => {
+  if (!props.disabled) {
+    emit('click', props.value)
+  }
 }
 </script>
 
@@ -128,6 +138,11 @@ const onTouchEnd = () => {
 
 .button-disabled:hover {
   transform: none;
+}
+
+.button-active {
+  background-color: var(--sol-violet) !important;
+  color: var(--sol-base3) !important;
 }
 
 /* Special spacing for empty grid cell */

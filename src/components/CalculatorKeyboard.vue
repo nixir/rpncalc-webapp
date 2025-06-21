@@ -1,5 +1,35 @@
 <template>
   <div class="calculator-keyboard">
+    <div class="keyboard-row">
+      <CalculatorButton
+        label="BIN"
+        value="bin"
+        type="function"
+        :active="props.displayMode === 'binary'"
+        @click="handleButtonClick"
+      />
+      <CalculatorButton
+        label="OCT"
+        value="oct"
+        type="function"
+        :active="props.displayMode === 'octal'"
+        @click="handleButtonClick"
+      />
+      <CalculatorButton
+        label="DEC"
+        value="dec"
+        type="function"
+        :active="props.displayMode === 'decimal'"
+        @click="handleButtonClick"
+      />
+      <CalculatorButton
+        label="HEX"
+        value="hex"
+        type="function"
+        :active="props.displayMode === 'hexadecimal'"
+        @click="handleButtonClick"
+      />
+    </div>
     <!-- Row 1: Enter (3.5 columns), +/-, EEX -->
     <div class="keyboard-row">
       <CalculatorButton
@@ -60,6 +90,14 @@
 <script setup lang="ts">
 import CalculatorButton from './CalculatorButton.vue'
 
+interface Props {
+  displayMode?: 'decimal' | 'binary' | 'octal' | 'hexadecimal'
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  displayMode: 'decimal',
+})
+
 const emit = defineEmits<{
   buttonPress: [value: string]
 }>()
@@ -87,7 +125,7 @@ const handleButtonClick = (value: string) => {
   min-height: 60px;
 }
 
-/* Enter button spans exactly 3 columns including gaps */
+/* Enter button spans exactly 2 columns including gaps */
 .enter-button {
   grid-column: span 3;
 }

@@ -5,11 +5,15 @@
         :stack="store.stack"
         :current-input="store.currentDisplay"
         :input-mode="store.inputMode"
+        :display-mode="store.displayMode"
+        :to-binary-string="store.toBinaryString"
+        :to-octal-string="store.toOctalString"
+        :to-hex-string="store.toHexString"
       />
     </div>
 
     <div class="calculator-keyboard-area">
-      <CalculatorKeyboard @button-press="handleButtonPress" />
+      <CalculatorKeyboard :display-mode="store.displayMode" @button-press="handleButtonPress" />
     </div>
   </div>
 </template>
@@ -79,6 +83,22 @@ const handleButtonPress = (value: string) => {
 
     case 'undo':
       store.undoLastOperation()
+      break
+
+    case 'bin':
+      store.setDisplayMode('binary')
+      break
+
+    case 'dec':
+      store.setDisplayMode('decimal')
+      break
+
+    case 'oct':
+      store.setDisplayMode('octal')
+      break
+
+    case 'hex':
+      store.setDisplayMode('hexadecimal')
       break
 
     default:

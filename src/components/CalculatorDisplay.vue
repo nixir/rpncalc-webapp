@@ -4,10 +4,27 @@
     <div
       v-for="(item, index) in stackDisplay"
       :key="`stack-${index}`"
-      :class="['stack-item', { 'current-input': item.isCurrentInput }]"
+      :class="[
+        'stack-item',
+        {
+          'current-input': item.isCurrentInput,
+          'binary-mode': displayMode === 'binary',
+          'octal-mode': displayMode === 'octal',
+          'hex-mode': displayMode === 'hexadecimal',
+        },
+      ]"
     >
       <div class="stack-label">{{ item.label }}</div>
-      <div class="stack-value">{{ item.value }}</div>
+      <div
+        class="stack-value"
+        :class="{
+          'binary-display': displayMode === 'binary' && item.value.startsWith('0b'),
+          'octal-display': displayMode === 'octal' && item.value.startsWith('0o'),
+          'hex-display': displayMode === 'hexadecimal' && item.value.startsWith('0x'),
+        }"
+      >
+        {{ item.value }}
+      </div>
     </div>
   </div>
 </template>
@@ -19,6 +36,10 @@ interface Props {
   stack: number[]
   currentInput: string
   inputMode: boolean
+  displayMode: 'decimal' | 'binary' | 'octal' | 'hexadecimal'
+  toBinaryString: (value: number) => string
+  toOctalString: (value: number) => string
+  toHexString: (value: number) => string
 }
 
 const props = defineProps<Props>()
@@ -56,6 +77,22 @@ const stackDisplay = computed(() => {
 })
 
 const formatNumber = (value: number): string => {
+  // Binary mode
+  if (props.displayMode === 'binary') {
+    return props.toBinaryString(value)
+  }
+
+  // Octal mode
+  if (props.displayMode === 'octal') {
+    return props.toOctalString(value)
+  }
+
+  // Hexadecimal mode
+  if (props.displayMode === 'hexadecimal') {
+    return props.toHexString(value)
+  }
+
+  // Decimal mode - original logic
   // Handle special cases
   if (value === 0) return '0'
   if (!isFinite(value)) return 'Error'
@@ -115,6 +152,24 @@ const formatNumber = (value: number): string => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Binary mode styling for better readability */
+.stack-value.binary-display {
+  font-size: 1.6rem;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+}
+
+/* Octal mode styling for better readability */
+.stack-value.octal-display {
+  font-size: 1.7rem;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+}
+
+/* Hexadecimal mode styling for better readability */
+.stack-value.hex-display {
+  font-size: 1.6rem;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
 }
 
 .stack-item.current-input .stack-value {

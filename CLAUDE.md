@@ -29,10 +29,11 @@ This is a Vue 3 + TypeScript web application for an RPN (Reverse Polish Notation
 **Project Structure:**
 
 - `src/components/` - Vue components
+- `src/components/__tests__/` - Vue components Unit tests
 - `src/stores/` - Pinia stores for state management
+- `src/stores/__tests__/` - Unit tests of Pinia stores for state management
 - `src/assets/` - Static assets (CSS, images)
 - `e2e/` - End-to-end tests
-- `src/components/__tests__/` - Unit tests
 
 **Key Conventions:**
 
@@ -44,6 +45,11 @@ This is a Vue 3 + TypeScript web application for an RPN (Reverse Polish Notation
 **Deployment Configuration:**
 
 - Vite base path is set to `/rpncalc-webapp/` for GitHub Pages deployment
+
+**Project rules**
+
+- コミット前にフォーマッタをかける。
+- コミット前にLintをかける
 
 **Output:**
 
